@@ -1,0 +1,9 @@
+#.gitignore file
+
+#Ignoruj foldery tworzone przez eclipse
+Debug/
+.settings/
+
+#Ignoruj pliki z konfiguracja projektu eclipse
+.cproject
+.project
