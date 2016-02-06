@@ -24,6 +24,7 @@ STATUS regulator_init(IN INIT_PID_PARAM *init_values,
 	regulator->P_sel = init_values->P_sel;
 	regulator->I_sel = init_values->I_sel;
 	regulator->D_sel = init_values->D_sel;
+	regulator->AntiWindup_sel = init_values->AntiWindup_sel;
 	regulator->Tp     = init_values->Tp; 	//probkowanie regulatora [s]
 	regulator->Ti     = init_values->Ti;	//czas zdwojenia [s]
 	regulator->Td     = init_values->Td;	//stala rozniczkowania

@@ -21,6 +21,7 @@ typedef struct _INIT_PID_PARAM
   BOOL P_sel;
   BOOL I_sel;
   BOOL D_sel;
+  BOOL AntiWindup_sel;
   double kp;
   double Ti;
   double Td;
@@ -58,6 +59,7 @@ typedef struct _PID_PARAM
  BOOL P_sel;
  BOOL I_sel;
  BOOL D_sel;
+ BOOL AntiWindup_sel;
  double kp;
  double Ti;
  double Td;
