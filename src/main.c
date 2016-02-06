@@ -129,10 +129,13 @@ int main(int argc, char *argv[])
 
 
 	//koniec symulacji - zwijamy sie
-	regulator_func.Close(&RegulatorPID);
+
 	model_func.Close(&ModelParams);
-	regulator_func.Close(&RegulatorPurePID);
 	model_func.Close(&ModelPureParams);
+	model_func.Close(&ModelRefParams);
+	regulator_func.Close(&RegulatorPID);
+	regulator_func.Close(&RegulatorPurePID);
+	regulator_func.Close(&RegulatorRefPID);
 	sim_func.Close(&SimulationParams);
 	output_file_close(output_file);
 	return 0;
