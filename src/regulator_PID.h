@@ -35,16 +35,23 @@ typedef struct _INIT_PID_PARAM
 /** @brief parametry runtime regulatora */
 typedef struct _RUNTIME_PID_PARAM
 {
+ double P;
+ double I;
+ double D;
  double CS;	//aktualny Control Signal podany na obiekt
  long il_pr_CS;	//co ile probek(iteracji symulacji) obliczyc CS
  long zl_il_pr_CS; //biezaca zliczona ilosc probek
 
 
  double e; //	aktualny uchyb
+ double es; //	aktualny uchyb dla antiwindup
  double calka_e;
+ double calka_es;
  double rozniczka_e;
  double prev_e;
  double prev_calka_e;
+ double prev_es;
+ double prev_calka_es;
 
 } RUNTIME_PID_PARAM;
 
@@ -64,6 +71,7 @@ typedef struct _PID_PARAM
  double Ti;
  double Td;
  double Tp;		//okres probkowania
+ double Tt;		//windup tracking time
  double CS_min;	//mininalny Control Signal
  double CS_max; //maksymalny Control Signal
  unsigned char     Initialized :1,
