@@ -27,6 +27,7 @@ STATUS regulator_init(IN INIT_PID_PARAM *init_values,
 	regulator->Tp     = init_values->Tp; 	//probkowanie regulatora [s]
 	regulator->Ti     = init_values->Ti;	//czas zdwojenia [s]
 	regulator->Td     = init_values->Td;	//stala rozniczkowania
+	regulator->Tt     = init_values->Tt;	//anti-windup tracking time
 	regulator->kp     = init_values->kp;	//wzmocnienie regulatora
 
 	//ograniczenie wyjscia regulatora

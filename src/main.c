@@ -59,6 +59,7 @@ int main(int argc, char *argv[])
  init_values.pid.Ti = 3.0;
  init_values.pid.Td = 0.0;
  init_values.pid.Tp = 1.0;
+ init_values.pid.Tt = 2.0;
  init_values.pid.CS_min = -3.0;
  init_values.pid.CS_max = 3.0;
 

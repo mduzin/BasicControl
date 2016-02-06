@@ -26,6 +26,7 @@ typedef struct _INIT_PID_PARAM
   double Ti;
   double Td;
   double Tp;		//okres probkowania
+  double Tt;		//antiwindup tracking time
   double CS_min;	//mininalny Control Signal
   double CS_max;    //maksymalny Control Signal
 }INIT_PID_PARAM;
