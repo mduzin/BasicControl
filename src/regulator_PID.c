@@ -12,8 +12,6 @@
 
 //<TODO:> Anti-Windup mechanizm
 
-//funckja podmieniaj¹ca wartosc kp w zaleznosci od uchybu
-double PidGetKpValue(double e);
 
 STATUS regulator_init(IN INIT_PID_PARAM *init_values,
 		              IN SIMULATION_PARAM *SimulationParams,
@@ -85,8 +83,6 @@ STATUS regulator_run(SIMULATION_PARAM *simulation,PID_PARAM *regulator,MODEL_PAR
 
 				//<TODO:> Anti-windup
 
-				//<innovation>
-				regulator->kp = PidGetKpValue(regulator->Runtime.e);
 
 				//obliczanie CS
 				P = (regulator->P_sel)? ((regulator->kp) * (regulator->Runtime.e)) : (double)0.0;
@@ -123,12 +119,3 @@ return STATUS_SUCCESS;
 }
 
 
-double PidGetKpValue(double e)
-{
-  double a = (0 < e)? 0.6 : -0.6;
-  double b = 1.0;
-
-  return ((a * e) + b);
-
-
-}
