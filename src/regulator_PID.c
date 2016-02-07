@@ -10,7 +10,6 @@
 #include "sim_env.h"
 #include "model_1.h"
 
-static STATUS regulator_antiwindup(IO PID_PARAM *regulator);
 
 STATUS regulator_init(IN INIT_PID_PARAM *init_values,
 		              IN SIMULATION_PARAM *SimulationParams,
@@ -58,8 +57,6 @@ STATUS regulator_init(IN INIT_PID_PARAM *init_values,
 STATUS regulator_run(SIMULATION_PARAM *simulation,PID_PARAM *regulator,MODEL_PARAM *model)
 {
 
-	double CS_temp;		//wartosc sterowanie przed sprawdzeniem nasycenia, potrzebna dla anti-windup
-
 	if(FALSE == regulator->Pid_On)
 	{
 		regulator->Runtime.CS = simulation->Runtime.akt_SP;
@@ -77,10 +74,16 @@ STATUS regulator_run(SIMULATION_PARAM *simulation,PID_PARAM *regulator,MODEL_PAR
 				regulator->Runtime.prev_e = regulator->Runtime.e;
 				regulator->Runtime.prev_calka_e = regulator->Runtime.calka_e;
 
+				regulator->Runtime.prev_es = regulator->Runtime.es;
+				regulator->Runtime.prev_calka_es = regulator->Runtime.calka_es;
+
 				//oblicz uchyb
 				regulator->Runtime.e = simulation->Runtime.akt_SP - model->Runtime.y;
+				regulator->Runtime.es = regulator->Runtime.CS - regulator->Runtime.CS_raw;
+
 				//oblicz calke
-				regulator->Runtime.calka_e =  regulator->Runtime.prev_calka_e + (regulator->Tp/2.0)*(regulator->Runtime.prev_e + regulator->Runtime.e);
+				regulator->Runtime.calka_e  =  regulator->Runtime.prev_calka_e + (regulator->Tp/2.0)*(regulator->Runtime.prev_e + regulator->Runtime.e);
+				regulator->Runtime.calka_es =  regulator->Runtime.prev_calka_es + (regulator->Tp/2.0)*(regulator->Runtime.prev_es + regulator->Runtime.es);
 				//oblicz rozniczke
 				regulator->Runtime.rozniczka_e = regulator->Runtime.e - regulator->Runtime.prev_e;
 
@@ -95,8 +98,7 @@ STATUS regulator_run(SIMULATION_PARAM *simulation,PID_PARAM *regulator,MODEL_PAR
 				if(TRUE == regulator->AntiWindup_sel)
 				{
 				  //Anti-windup algorithm
-			      regulator_antiwindup(regulator);
-
+				  regulator->Runtime.I = (regulator->I_sel)? (((1.0/regulator->Ti)*(regulator->Runtime.calka_e))+((1.0/regulator->Tt)*(regulator->Runtime.calka_es))) : (double)0.0;
 				}
 				else
 				{
@@ -107,22 +109,23 @@ STATUS regulator_run(SIMULATION_PARAM *simulation,PID_PARAM *regulator,MODEL_PAR
 				regulator->Runtime.D = (regulator->D_sel)? ((regulator->Td)*regulator->Runtime.rozniczka_e): (double)0.0;
 
 				//P+I+D
-				regulator->Runtime.CS = (regulator->Runtime.P + regulator->Runtime.I + regulator->Runtime.D);
+				regulator->Runtime.CS_raw = (regulator->Runtime.P + regulator->Runtime.I + regulator->Runtime.D);
 
-				CS_temp = regulator->Runtime.CS;
 
 				//Saturation
 				//nasycenie wyjscia regulatora
-				if(regulator->CS_max < regulator->Runtime.CS )
+				if(regulator->CS_max < regulator->Runtime.CS_raw )
 				{
 					regulator->Runtime.CS = regulator->CS_max;
 				}
-				else if(regulator->CS_min > regulator->Runtime.CS )
+				else if(regulator->CS_min > regulator->Runtime.CS_raw )
 				{
 				    regulator->Runtime.CS = regulator->CS_min;
 				}
-
-				regulator->Runtime.es = regulator->Runtime.CS - CS_temp;
+				else
+				{
+					regulator->Runtime.CS = regulator->Runtime.CS_raw;
+				}
 
 				//printf("Nowy CS:@ %f, CS: %3.3f, e: %3.3f calka_e: %3.3f\n",simulation->Runtime.akt_Tsym,regulator->Runtime.CS, regulator->Runtime.e,regulator->Runtime.calka_e);
 
@@ -139,36 +142,6 @@ STATUS regulator_close(PID_PARAM *regulator)
 {
 //narazie nie mamy nic do roboty przy zwijaniu regulatora
 return STATUS_SUCCESS;
-}
-
-static STATUS regulator_antiwindup(IO PID_PARAM *regulator)
-{
-  //Algorithm Tracking anti-windup, back-calculation
-  //Algorytm anti-windup modyfikuje nam sposob obliczania calki uchybu
-  //Ref: http://www.scs-europe.net/services/ecms2006/ecms2006%20pdf/107-ind.pdf
-  //wpierw obliczamy uchyb dla czlona calkujacego: czyli (1/Ti)*e
-  // potem liczymy uchyb wyjscia regulatora (roznica miedzy wyj. reg. a limitem regulatora)
-  // i calosc symujemy i robimy na tym nowa calke
-  // potem przeliczamy sterowanie na nowo
-
-
-  if(NULL == regulator)
-  {
- 	 return STATUS_PTR_ERROR;
-  }
-  else
-  {
-	 //obliczamy calke sygnalu es
-     regulator->Runtime.calka_es =  regulator->Runtime.prev_calka_es + (regulator->Tp/2.0)*(regulator->Runtime.prev_es + regulator->Runtime.es);
-     //modyfikujemy tor I regulatora
-     regulator->Runtime.I = (regulator->I_sel)? (((1.0/regulator->Ti)*(regulator->Runtime.calka_e))+((1.0/regulator->Tt)*(regulator->Runtime.calka_es))) : (double)0.0;
-
-     //przepisz wartosci
-      regulator->Runtime.prev_es = regulator->Runtime.es;
-      regulator->Runtime.prev_calka_es = regulator->Runtime.calka_es;
-
-     return STATUS_SUCCESS;
-  }
 }
 
 

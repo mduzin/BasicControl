@@ -39,7 +39,8 @@ typedef struct _RUNTIME_PID_PARAM
  double P;
  double I;
  double D;
- double CS;	//aktualny Control Signal podany na obiekt
+ double CS_raw;	//Control Signal przed sprawdzaniem limitow wyjscia regulatora
+ double CS;	    //aktualny Control Signal podany na obiekt
  long il_pr_CS;	//co ile probek(iteracji symulacji) obliczyc CS
  long zl_il_pr_CS; //biezaca zliczona ilosc probek
 
