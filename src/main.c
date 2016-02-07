@@ -206,7 +206,7 @@ STATUS rectangle_signal(SIMULATION_PARAM *simulation)
     switch(state)
     	 {
     	 case 0:
-    		 output = 1.0;
+    		 output = 4.0;
     		 break;
     	 case 1:
     		 output = 0.0;
