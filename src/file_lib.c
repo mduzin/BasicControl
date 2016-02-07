@@ -115,10 +115,11 @@ STATUS log_file_init(IN char* filename, IO FILE **log_file)
 	{
 		printf("Otworto plik z logiem: %s.\n",filename);
 		//tworzymy nag³owki kolumn
-		sprintf(buff, "Czas[s], SetPoint[-],Wyjscie[-],Sterowanie[-],Uchyb[-],CalkaUchyb[-],RozniczkaUchyb[-]\n");
+		sprintf(buff, "Czas[s], SetPoint[-],Wyjscie[-],Sterowanie[-],Uchyb[-],CalkaUchyb[-],RozniczkaUchyb[-],P[-],I[-],D[-],es[-],Calka_es[-]\n");
 		fputs(buff, *log_file);
 		return STATUS_SUCCESS;
 	}
+   return STATUS_FAILURE;
 }
 
 
@@ -131,14 +132,20 @@ STATUS log_file_write(IO FILE *output_file,
 
 	 if(output_file)
 	  {
-		 sprintf(buff, "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\n",
+		 sprintf(buff, "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\n",
 				 (simulation->Runtime.akt_Tsym),
 				 (simulation->Runtime.akt_SP),
 				 (model->Runtime.y),
 				 (regulator->Runtime.CS),
 				 (regulator->Runtime.e),
 				 (regulator->Runtime.calka_e),
-				 (regulator->Runtime.rozniczka_e));
+				 (regulator->Runtime.rozniczka_e),
+				 (regulator->Runtime.P),
+				 (regulator->Runtime.I),
+				 (regulator->Runtime.D),
+				 (regulator->Runtime.es),
+				 (regulator->Runtime.calka_es)
+		       );
 		 fputs(buff, output_file);
 		 //remove \0 z konca linii
 		 return STATUS_SUCCESS;

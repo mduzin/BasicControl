@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
  init_values.pid.I_sel = TRUE;
  init_values.pid.D_sel = FALSE;
  init_values.pid.AntiWindup_sel = FALSE;
- init_values.pid.kp = 0.75;
+ init_values.pid.kp = 0.25;
  init_values.pid.Ti = 3.0;
  init_values.pid.Td = 0.0;
  init_values.pid.Tp = 1.0;
