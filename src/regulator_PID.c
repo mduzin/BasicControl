@@ -10,7 +10,7 @@
 #include "sim_env.h"
 #include "model_1.h"
 
-static STATUS regulator_antiwindup(IO PID_PARAM *regulator);
+static STATUS regulator_antiwindup(IO PID_PARAM *regulator, IN double raw_CS);
 
 STATUS regulator_init(IN INIT_PID_PARAM *init_values,
 		              IN SIMULATION_PARAM *SimulationParams,
@@ -19,31 +19,31 @@ STATUS regulator_init(IN INIT_PID_PARAM *init_values,
 	STATUS status = STATUS_SUCCESS;
 
 	//parametry regulatora
-	regulator->Pid_On = init_values->Pid_On; //wl/wyl algorytm regualacji
-	regulator->P_sel = init_values->P_sel;
-	regulator->I_sel = init_values->I_sel;
-	regulator->D_sel = init_values->D_sel;
+	regulator->Pid_On         = init_values->Pid_On; //wl/wyl algorytm regualacji
+	regulator->P_sel          = init_values->P_sel;
+	regulator->I_sel          = init_values->I_sel;
+	regulator->D_sel          = init_values->D_sel;
 	regulator->AntiWindup_sel = init_values->AntiWindup_sel;
-	regulator->Tp     = init_values->Tp; 	//probkowanie regulatora [s]
-	regulator->Ti     = init_values->Ti;	//czas zdwojenia [s]
-	regulator->Td     = init_values->Td;	//stala rozniczkowania
-	regulator->Tt     = init_values->Tt;	//anti-windup tracking time
-	regulator->kp     = init_values->kp;	//wzmocnienie regulatora
+	regulator->Tp             = init_values->Tp; 	//probkowanie regulatora [s]
+	regulator->Ti             = init_values->Ti;	//czas zdwojenia [s]
+	regulator->Td             = init_values->Td;	//stala rozniczkowania
+	regulator->Tt             = init_values->Tt;	//anti-windup tracking time
+	regulator->kp             = init_values->kp;	//wzmocnienie regulatora
 
 	//ograniczenie wyjscia regulatora
 	regulator->CS_max = init_values->CS_max;
 	regulator->CS_min = init_values->CS_min;
 
 	//parametry dynamiczne
-	regulator->Runtime.e = 0.0;			 //	aktualny uchyb
-	regulator->Runtime.es = 0.0;
-	regulator->Runtime.calka_e = 0.0;
-	regulator->Runtime.calka_es = 0.0;
-	regulator->Runtime.prev_e = 0.0;
-	regulator->Runtime.prev_es = 0.0;
-	regulator->Runtime.prev_calka_e = 0.0;
+	regulator->Runtime.e             = 0.0;	 //	aktualny uchyb
+	regulator->Runtime.es            = 0.0;
+	regulator->Runtime.calka_e       = 0.0;
+	regulator->Runtime.calka_es      = 0.0;
+	regulator->Runtime.prev_e        = 0.0;
+	regulator->Runtime.prev_es       = 0.0;
+	regulator->Runtime.prev_calka_e  = 0.0;
 	regulator->Runtime.prev_calka_es = 0.0;
-	regulator->Runtime.rozniczka_e = 0.0;
+	regulator->Runtime.rozniczka_e   = 0.0;
 
 	//co ile iteracji wyznaczamy nowy Control Signal
 	regulator->Runtime.il_pr_CS = DIV_ROUND_CLOSEST(regulator->Tp, SimulationParams->Tc);
@@ -57,6 +57,8 @@ STATUS regulator_init(IN INIT_PID_PARAM *init_values,
 //funkcja obliczajaca wyjscie regulatora PID
 STATUS regulator_run(SIMULATION_PARAM *simulation,PID_PARAM *regulator,MODEL_PARAM *model)
 {
+
+	double CS_temp;		//wartosc sterowanie przed sprawdzeniem nasycenia, potrzebna dla anti-windup
 
 	if(FALSE == regulator->Pid_On)
 	{
@@ -90,16 +92,9 @@ STATUS regulator_run(SIMULATION_PARAM *simulation,PID_PARAM *regulator,MODEL_PAR
 				regulator->Runtime.D = (regulator->D_sel)? ((regulator->Td)*regulator->Runtime.rozniczka_e): (double)0.0;
 				regulator->Runtime.CS = (regulator->Runtime.P + regulator->Runtime.I + regulator->Runtime.D);
 
-				//Placeholder for Anti-windup algorithm
-				if(TRUE == regulator->AntiWindup_sel)
-				{
-				   //Anti-windup algorithm
-					regulator_antiwindup(regulator);
+				CS_temp = regulator->Runtime.CS;
 
-				}
-
-
-				//Saturation
+						//Saturation
 				//nasycenie wyjscia regulatora
 				if(regulator->CS_max < regulator->Runtime.CS )
 				{
@@ -110,6 +105,13 @@ STATUS regulator_run(SIMULATION_PARAM *simulation,PID_PARAM *regulator,MODEL_PAR
 				    regulator->Runtime.CS = regulator->CS_min;
 				}
 
+
+				//Anti-windup algorithm
+				if(TRUE == regulator->AntiWindup_sel)
+				{
+				   //Anti-windup algorithm
+				   regulator_antiwindup(regulator,CS_temp);
+				}
 
 				//printf("Nowy CS:@ %f, CS: %3.3f, e: %3.3f calka_e: %3.3f\n",simulation->Runtime.akt_Tsym,regulator->Runtime.CS, regulator->Runtime.e,regulator->Runtime.calka_e);
 
@@ -128,7 +130,7 @@ STATUS regulator_close(PID_PARAM *regulator)
 return STATUS_SUCCESS;
 }
 
-static STATUS regulator_antiwindup(IO PID_PARAM *regulator)
+static STATUS regulator_antiwindup(IO PID_PARAM *regulator, IN double raw_CS)
 {
   //Algorithm Tracking anti-windup, back-calculation
   //Algorytm anti-windup modyfikuje nam sposob obliczania calki uchybu
@@ -138,6 +140,10 @@ static STATUS regulator_antiwindup(IO PID_PARAM *regulator)
   // i calosc symujemy i robimy na tym nowa calke
   // potem przeliczamy sterowanie na nowo
 
+  //przepisz poprzednie wartosci
+  regulator->Runtime.prev_es = regulator->Runtime.es;
+  regulator->Runtime.prev_calka_es = regulator->Runtime.calka_es;
+
   regulator->Runtime.es = 0.0;
 
   if(NULL == regulator)
@@ -146,15 +152,8 @@ static STATUS regulator_antiwindup(IO PID_PARAM *regulator)
   }
   else
   {
+	 regulator->Runtime.es = regulator->Runtime.CS - raw_CS;
 
-     if(regulator->CS_max < regulator->Runtime.CS )
-     {
-	   regulator->Runtime.es = regulator->Runtime.CS - regulator->CS_max;
-     }
-     else if(regulator->CS_min > regulator->Runtime.CS )
-     {
-	   regulator->Runtime.es =  regulator->Runtime.CS - regulator->CS_min;
-     }
      //obliczamy calke sygnalu es
      regulator->Runtime.calka_es =  regulator->Runtime.prev_calka_es + (regulator->Tp/2.0)*(regulator->Runtime.prev_es + regulator->Runtime.es);
 
