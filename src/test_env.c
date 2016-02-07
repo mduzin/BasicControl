@@ -9,7 +9,7 @@
 #include "test_env.h"
 
 //strutura z funkcjami srodowiska symulacji
-SIM_ENV_FUNC sim_func = {simulation_iter,saw_signal, simulation_init, simulation_close};
+SIM_ENV_FUNC sim_func = {simulation_iter,rectangle_signal, simulation_init, simulation_close};
 //strutura z funkcjami regulatora
 PID_FUNC regulator_func = {regulator_run, regulator_init, regulator_close};
 //strutura z funkcjami regulatora

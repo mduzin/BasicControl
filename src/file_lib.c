@@ -11,7 +11,6 @@
 
 #include "common.h"
 #include "file_lib.h"
-#include "../utils/math_fixed.h"
 
 STATUS output_file_init(IN char* filename, IO FILE **output_file)
 {
@@ -133,13 +132,13 @@ STATUS log_file_write(IO FILE *output_file,
 	 if(output_file)
 	  {
 		 sprintf(buff, "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\n",
-				 MathFixedToFloat(simulation->Runtime.akt_Tsym),
-				 MathFixedToFloat(simulation->Runtime.akt_SP),
-				 MathFixedToFloat(model->Runtime.y),
-				 MathFixedToFloat(regulator->Runtime.CS),
-				 MathFixedToFloat(regulator->Runtime.e),
-				 MathFixedToFloat(regulator->Runtime.calka_e),
-				 MathFixedToFloat(regulator->Runtime.rozniczka_e));
+				 (simulation->Runtime.akt_Tsym),
+				 (simulation->Runtime.akt_SP),
+				 (model->Runtime.y),
+				 (regulator->Runtime.CS),
+				 (regulator->Runtime.e),
+				 (regulator->Runtime.calka_e),
+				 (regulator->Runtime.rozniczka_e));
 		 fputs(buff, output_file);
 		 //remove \0 z konca linii
 		 return STATUS_SUCCESS;

@@ -35,6 +35,9 @@ PID_PARAM RegulatorPurePID;
 FILE *input_file;
 FILE *output_file;
 
+FILE *ModelTest_file;
+FILE *ModelWindupTest_file;
+
 STATUS get_command_line_arg(IN int argc,IN char *argv[],OUT char** input_filename, OUT char** output_filename);
 
 
@@ -70,7 +73,7 @@ int main(int argc, char *argv[])
 
  //Referencyjny ma tylko wylaczonego PID'a i inny model
  init_windup_values = init_values;
- init_windup_values.pid.AntiWindup_sel = FALSE;
+ init_windup_values.pid.AntiWindup_sel = TRUE;
 
 
  //Pure ma tylko wylaczonego PID'a reszta jest ta sama
@@ -87,6 +90,9 @@ int main(int argc, char *argv[])
 
 	//inicjalizacja
 	output_file_init(output_filename,&output_file);
+	log_file_init("ModelTestLog.csv",&ModelTest_file);
+	log_file_init("ModelWindupTestLog.csv",&ModelWindupTest_file);
+
 	sim_func.Init(&init_values.sim,&SimulationParams);
 	//Nasz regulator + obiekt
 	model_func.Init(&init_values.model,&SimulationParams,&ModelParams);
@@ -116,7 +122,7 @@ int main(int argc, char *argv[])
 		 model_func.Run(&SimulationParams,&RegulatorPurePID,&ModelPureParams);
 
 		 //zapis do pliku wynikow kroku symulacji
-		 write_output_line(output_file,
+		 output_file_write(output_file,
 				           SimulationParams.Runtime.akt_Tsym,
 				           SimulationParams.Runtime.akt_SP,
 				           ModelParams.Runtime.y,
@@ -124,6 +130,9 @@ int main(int argc, char *argv[])
 				           ModelWindupParams.Runtime.y,
 				           RegulatorPID.Runtime.CS
 				           );
+
+		 log_file_write(ModelTest_file,&SimulationParams,&RegulatorPID,&ModelParams);
+		 log_file_write(ModelWindupTest_file,&SimulationParams,&RegulatorWindupPID,&ModelWindupParams);
 
 		 //aktualizacja parametrow symulacji, sprawdz czy koniec symulacji
 		 if(STATUS_SUCCESS != (sim_func.Iter(&SimulationParams)))
@@ -142,6 +151,8 @@ int main(int argc, char *argv[])
 	regulator_func.Close(&RegulatorWindupPID);
 	sim_func.Close(&SimulationParams);
 	output_file_close(output_file);
+	log_file_close(ModelTest_file);
+	log_file_close(ModelWindupTest_file);
 	return 0;
 }
 
@@ -186,7 +197,7 @@ STATUS rectangle_signal(SIMULATION_PARAM *simulation)
     }
 
 exit:
-simulation->Runtime.akt_SP = (double)state;
+simulation->Runtime.akt_SP = (double)state * 4;
 acc_time += simulation->Tc;
 
 	return STATUS_SUCCESS;
