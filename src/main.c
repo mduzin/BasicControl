@@ -14,7 +14,6 @@
 
 #include "common.h"
 #include "file_lib.h"
-//#include "input_signal.h"
 #include "sim_env.h"
 #include "regulator_PID.h"
 #include "model_1.h"
@@ -23,12 +22,16 @@
 
 //Zmienne globalne
 SIMULATION_PARAM SimulationParams;
+
 MODEL_PARAM ModelParams;
 PID_PARAM RegulatorPID;
+
+MODEL_PARAM ModelWindupParams;
+PID_PARAM RegulatorWindupPID;
+
 MODEL_PARAM ModelPureParams;
 PID_PARAM RegulatorPurePID;
-MODEL_PARAM ModelRefParams;
-PID_PARAM RegulatorRefPID;
+
 FILE *input_file;
 FILE *output_file;
 
@@ -41,8 +44,9 @@ int main(int argc, char *argv[])
  char *output_filename;
 
  INIT_TEST_VALUES init_values;
+ INIT_TEST_VALUES init_windup_values;
  INIT_TEST_VALUES init_pure;
- INIT_TEST_VALUES init_ref;
+
 
  init_values.sim.Tc = 0.01;
  init_values.sim.Tsym = 400.0;
@@ -55,7 +59,7 @@ int main(int argc, char *argv[])
  init_values.pid.P_sel = TRUE;
  init_values.pid.I_sel = TRUE;
  init_values.pid.D_sel = FALSE;
- init_values.pid.AntiWindup_sel = TRUE;
+ init_values.pid.AntiWindup_sel = FALSE;
  init_values.pid.kp = 0.75;
  init_values.pid.Ti = 3.0;
  init_values.pid.Td = 0.0;
@@ -64,16 +68,14 @@ int main(int argc, char *argv[])
  init_values.pid.CS_min = -3.0;
  init_values.pid.CS_max = 3.0;
 
+ //Referencyjny ma tylko wylaczonego PID'a i inny model
+ init_windup_values = init_values;
+ init_windup_values.pid.AntiWindup_sel = FALSE;
+
+
  //Pure ma tylko wylaczonego PID'a reszta jest ta sama
  init_pure = init_values;
  init_pure.pid.Pid_On = FALSE;
-
- //Referencyjny ma tylko wylaczonego PID'a i inny model
- init_ref = init_values;
- init_ref.pid.Pid_On = FALSE;
- init_ref.model.k= 1.0;
- init_ref.model.Ts = 1.0;
- init_ref.model.Tdelay = 0.5;
 
 
 	printf("Symulacja obiektu I-ego rzedu\n");
@@ -89,13 +91,14 @@ int main(int argc, char *argv[])
 	//Nasz regulator + obiekt
 	model_func.Init(&init_values.model,&SimulationParams,&ModelParams);
 	regulator_func.Init(&init_values.pid,&SimulationParams,&RegulatorPID);
+
+	//Nasz regulator z windupem + obiekt
+	model_func.Init(&init_windup_values.model,&SimulationParams,&ModelWindupParams);
+	regulator_func.Init(&init_windup_values.pid,&SimulationParams,&RegulatorWindupPID);
+
 	//Tylko obiekt
 	model_func.Init(&init_pure.model,&SimulationParams,&ModelPureParams);
 	regulator_func.Init(&init_pure.pid,&SimulationParams,&RegulatorPurePID);
-	//Obiekt referencyjny + wylaczony PID
-	model_func.Init(&init_ref.model,&SimulationParams,&ModelRefParams);
-	regulator_func.Init(&init_ref.pid,&SimulationParams,&RegulatorRefPID);
-
 
 	//petla iteracji symulacji obiektu
 	while(TRUE)
@@ -105,12 +108,12 @@ int main(int argc, char *argv[])
 		 //obiekt+wlaczony regulator
 		 regulator_func.Run(&SimulationParams,&RegulatorPID,&ModelParams);
 		 model_func.Run(&SimulationParams,&RegulatorPID,&ModelParams);
+		 //obiekt+wlaczony regulator z windupem
+		 regulator_func.Run(&SimulationParams,&RegulatorWindupPID,&ModelWindupParams);
+		 model_func.Run(&SimulationParams,&RegulatorWindupPID,&ModelWindupParams);
 		 //obiekt+wylaczony regulator
 		 regulator_func.Run(&SimulationParams,&RegulatorPurePID,&ModelPureParams);
 		 model_func.Run(&SimulationParams,&RegulatorPurePID,&ModelPureParams);
-		 //obiekt referencyjny+ regulator
-		 regulator_func.Run(&SimulationParams,&RegulatorRefPID,&ModelRefParams);
-		 model_func.Run(&SimulationParams,&RegulatorRefPID,&ModelRefParams);
 
 		 //zapis do pliku wynikow kroku symulacji
 		 write_output_line(output_file,
@@ -118,7 +121,7 @@ int main(int argc, char *argv[])
 				           SimulationParams.Runtime.akt_SP,
 				           ModelParams.Runtime.y,
 				           ModelPureParams.Runtime.y,
-				           ModelRefParams.Runtime.y,
+				           ModelWindupParams.Runtime.y,
 				           RegulatorPID.Runtime.CS
 				           );
 
@@ -133,10 +136,10 @@ int main(int argc, char *argv[])
 
 	model_func.Close(&ModelParams);
 	model_func.Close(&ModelPureParams);
-	model_func.Close(&ModelRefParams);
+	model_func.Close(&ModelWindupParams);
 	regulator_func.Close(&RegulatorPID);
 	regulator_func.Close(&RegulatorPurePID);
-	regulator_func.Close(&RegulatorRefPID);
+	regulator_func.Close(&RegulatorWindupPID);
 	sim_func.Close(&SimulationParams);
 	output_file_close(output_file);
 	return 0;
