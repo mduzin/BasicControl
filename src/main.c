@@ -168,37 +168,57 @@ STATUS step_signal(SIMULATION_PARAM *simulation)
 //sygnal prostokatny
 STATUS rectangle_signal(SIMULATION_PARAM *simulation)
 {
-    double time_on = 50.0;
-    double time_off = 50.0;
-    static double state = 1.0;
-    static double acc_time = 0.0;
+	double period = 25.0;  		 //czas co jaki zmieniamy stan wyjscia
+	static double acc_period = 0.0; //zliczony czas trawania stanu
+    static int state = 0;
+    double output;
+
 
     if(0.0 != simulation->Runtime.akt_Tsym)
-    {
-    	if(1.0 == state)
-    	{
-    		if(acc_time >= time_on)
-    		{
-    			state = 0.5;
-    			acc_time = 0.0;
- 				goto exit;
-    		}
-    	}
+   	 {
+   		 //dzialamy jest czas symulacji jest wiekszy od 0.0
 
-    	if(0.5 == state)
-    	{
-    		if(acc_time >= time_off)
-    		{
-    		  state = 1.0;
-    		  acc_time = 0.0;
-    		  goto exit;
-    		 }
-    	}
-    }
+   		 //zliczony czas period jest wiekszy-rowny od trwania period = zmiana stanu
+   		 if(acc_period >= period)
+   		 {
 
-exit:
-simulation->Runtime.akt_SP = (double)state * 4;
-acc_time += simulation->Tc;
+   			 //zmiana stanu
+   			 if(++state > 2)
+   			 {
+   				//po stanie 4 wracamy do stanu 0
+   				 state = 0;
+   			 }
+
+   			 //byla zmiana stanu wiec wyzeruj zliczony period(acc_period)
+   			 acc_period = 0.0;
+   		 }
+   		 else
+   		 {
+   			 //nie ma zmiany stanu tylko zwieksz acc_period
+   			 acc_period += simulation->Tc;
+   		 }
+   	 }
+   	 else
+   	 {
+   		//inicjalizacja maszynki (simulation->Runtime.akt_Tsym == 0)
+   		 state = 0;
+   	 }
+    switch(state)
+    	 {
+    	 case 0:
+    		 output = 1.0;
+    		 break;
+    	 case 1:
+    		 output = 0.0;
+    		 break;
+    	 default:
+    		 output = 0.0;
+    		 break;
+    	 }
+
+    	//wystaw do globalnej zmiennej symulacji
+    	simulation->Runtime.akt_SP = output;
+
 
 	return STATUS_SUCCESS;
 }
