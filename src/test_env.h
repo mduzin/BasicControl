@@ -34,6 +34,7 @@ typedef struct _INIT_TEST_VALUES
 	INIT_SIMULATION_PARAM sim;
 	INIT_PID_PARAM        pid;
 	INIT_MODEL_PARAM      model;
+	char*                 log_file_name;
 }INIT_TEST_VALUES;
 
 /** @brief typy funkcji powiazane z regulatorem*/

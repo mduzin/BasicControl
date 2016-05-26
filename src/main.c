@@ -19,26 +19,26 @@
 #include "model_1.h"
 #include "test_env.h"
 
+//<TODO:> Porobic makra ktore autamtycznie enable/disableuja poszczegolne model+regulator
+/*#define PURE_MODEL_ENABLE
+#define MODEL_ENABLE
+#define MODEL_WINDUP_ENABLE*/
 
 //Zmienne globalne
 SIMULATION_PARAM SimulationParams;
 
 MODEL_PARAM ModelParams;
-PID_PARAM RegulatorPID;
+PID_PARAM   RegulatorPID;
+FILE        *ModelTest_file;
 
 MODEL_PARAM ModelWindupParams;
-PID_PARAM RegulatorWindupPID;
+PID_PARAM   RegulatorWindupPID;
+FILE        *ModelWindupTest_file;
 
 MODEL_PARAM ModelPureParams;
 PID_PARAM RegulatorPurePID;
+FILE        *ModelPureTest_file;
 
-FILE *input_file;
-FILE *output_file;
-
-FILE *ModelTest_file;
-FILE *ModelWindupTest_file;
-
-STATUS get_command_line_arg(IN int argc,IN char *argv[],OUT char** input_filename, OUT char** output_filename);
 
 
 int main(int argc, char *argv[])
@@ -71,27 +71,27 @@ int main(int argc, char *argv[])
  init_values.pid.CS_min = -3.0;
  init_values.pid.CS_max = 3.0;
 
- //Referencyjny ma tylko wylaczonego PID'a i inny model
+ init_values.log_file_name = "Model1.csv";
+
+ //Windup model ma wlaczona opcje windupa
  init_windup_values = init_values;
  init_windup_values.pid.AntiWindup_sel = TRUE;
+
+ init_values.log_file_name = "Model1W.csv";
 
 
  //Pure ma tylko wylaczonego PID'a reszta jest ta sama
  init_pure = init_values;
  init_pure.pid.Pid_On = FALSE;
 
+ init_values.log_file_name = "Model1P.csv";
+
 
 	printf("Symulacja obiektu I-ego rzedu\n");
-	get_command_line_arg(argc,argv,&input_filename,&output_filename);
-
-	printf("Symulacja obiektu I-ego rzedu\n");
-	printf("Plik wejsciowy: %s\n",input_filename);
-	printf("Plik wyjsciowy: %s\n",output_filename);
 
 	//inicjalizacja
-	output_file_init(output_filename,&output_file);
-	log_file_init("ModelTestLog.csv",&ModelTest_file);
-	log_file_init("ModelWindupTestLog.csv",&ModelWindupTest_file);
+	log_file_init("Model1.csv",&ModelTest_file);
+	log_file_init("Model1W.csv",&ModelWindupTest_file);
 
 	sim_func.Init(&init_values.sim,&SimulationParams);
 	//Nasz regulator + obiekt
@@ -122,15 +122,6 @@ int main(int argc, char *argv[])
 		 model_func.Run(&SimulationParams,&RegulatorPurePID,&ModelPureParams);
 
 		 //zapis do pliku wynikow kroku symulacji
-		 output_file_write(output_file,
-				           SimulationParams.Runtime.akt_Tsym,
-				           SimulationParams.Runtime.akt_SP,
-				           ModelParams.Runtime.y,
-				           ModelPureParams.Runtime.y,
-				           ModelWindupParams.Runtime.y,
-				           RegulatorPID.Runtime.CS
-				           );
-
 		 log_file_write(ModelTest_file,&SimulationParams,&RegulatorPID,&ModelParams);
 		 log_file_write(ModelWindupTest_file,&SimulationParams,&RegulatorWindupPID,&ModelWindupParams);
 
@@ -150,171 +141,8 @@ int main(int argc, char *argv[])
 	regulator_func.Close(&RegulatorPurePID);
 	regulator_func.Close(&RegulatorWindupPID);
 	sim_func.Close(&SimulationParams);
-	output_file_close(output_file);
 	log_file_close(ModelTest_file);
 	log_file_close(ModelWindupTest_file);
 	return 0;
-}
-
-
-//Funcje sygnalow wejsciowych sa wywolywane w kazdej iteracji (czyli co okres calkowania)
-//skok jednostkowy
-STATUS step_signal(SIMULATION_PARAM *simulation)
-{
-    simulation->Runtime.akt_SP = 1.0;
-	return STATUS_SUCCESS;
-}
-
-//sygnal prostokatny
-STATUS rectangle_signal(SIMULATION_PARAM *simulation)
-{
-	double period = 25.0;  		 //czas co jaki zmieniamy stan wyjscia
-	static double acc_period = 0.0; //zliczony czas trawania stanu
-    static int state = 0;
-    double output;
-
-
-    if(0.0 != simulation->Runtime.akt_Tsym)
-   	 {
-   		 //dzialamy jest czas symulacji jest wiekszy od 0.0
-
-   		 //zliczony czas period jest wiekszy-rowny od trwania period = zmiana stanu
-   		 if(acc_period >= period)
-   		 {
-
-   			 //zmiana stanu
-   			 if(++state > 2)
-   			 {
-   				//po stanie 4 wracamy do stanu 0
-   				 state = 0;
-   			 }
-
-   			 //byla zmiana stanu wiec wyzeruj zliczony period(acc_period)
-   			 acc_period = 0.0;
-   		 }
-   		 else
-   		 {
-   			 //nie ma zmiany stanu tylko zwieksz acc_period
-   			 acc_period += simulation->Tc;
-   		 }
-   	 }
-   	 else
-   	 {
-   		//inicjalizacja maszynki (simulation->Runtime.akt_Tsym == 0)
-   		 state = 0;
-   	 }
-    switch(state)
-    	 {
-    	 case 0:
-    		 output = 4.0;
-    		 break;
-    	 case 1:
-    		 output = 0.0;
-    		 break;
-    	 default:
-    		 output = 0.0;
-    		 break;
-    	 }
-
-    	//wystaw do globalnej zmiennej symulacji
-    	simulation->Runtime.akt_SP = output;
-
-
-	return STATUS_SUCCESS;
-}
-
-//sygnal pila
-STATUS saw_signal(SIMULATION_PARAM *simulation)
-{
-	 double period = 25.0;  		 //czas co jaki zmieniamy stan wyjscia
-	 static double acc_period = 0.0; //zliczony czas trawania stanu
-	 static int state  = 0;			 //stan maszynki 0,1,2,3
-	 double output;					 //zwaracana wartosc
-
-
-
-	 if(0.0 != simulation->Runtime.akt_Tsym)
-	 {
-		 //dzialamy jest czas symulacji jest wiekszy od 0.0
-
-		 //zliczony czas period jest wiekszy-rowny od trwania period = zmiana stanu
-		 if(acc_period >= period)
-		 {
-
-			 //zmiana stanu
-			 if(++state > 4)
-			 {
-				//po stanie 4 wracamy do stanu 0
-				 state = 0;
-			 }
-
-			 //byla zmiana stanu wiec wyzeruj zliczony period(acc_period)
-			 acc_period = 0.0;
-		 }
-		 else
-		 {
-			 //nie ma zmiany stanu tylko zwieksz acc_period
-			 acc_period += simulation->Tc;
-		 }
-	 }
-	 else
-	 {
-		//inicjalizacja maszynki (simulation->Runtime.akt_Tsym == 0)
-		 state = 0;
-	 }
-
-	 //ustaw wyjscie w zalezenosci od stanu
-	 switch(state)
-	 {
-	 case 0:
-	 case 2:
-		 output = 0.0;
-		 break;
-	 case 1:
-		 output = 1.0;
-		 break;
-	 case 3:
-		 output = -1.0;
- 		 break;
-	 default:
-		 output = 0.0;
-		 break;
-	 }
-
-	//wystaw do globalnej zmiennej symulacji
-	simulation->Runtime.akt_SP = output;
-    return STATUS_SUCCESS;
-
-}
-
-
-STATUS get_command_line_arg(IN int argc,IN char *argv[],OUT char** input_filename, OUT char** output_filename)
-{
- STATUS Status = STATUS_SUCCESS;
- //char buff[MAX_STR_LEN];
- int input_strlen;
- int output_strlen;
- //sprawdz czy ilosc parametrow sie zgadza
- if(3 != argc)
- {
-	 printf("Niepoprawna ilosc argumentow\n");
-	 return STATUS_FAILURE;
- }
- else
- {
-     input_strlen = strlen(argv[1])+1;
-     output_strlen = strlen(argv[2])+1;
-
-     *input_filename = (char*)malloc(input_strlen * sizeof(char));
-     *output_filename = (char*)malloc(output_strlen * sizeof(char));
-
-     strcpy(*input_filename, argv[1]);
-     strcpy(*output_filename, argv[2]);
-
- }
-
-
- return Status;
-
 }
 
