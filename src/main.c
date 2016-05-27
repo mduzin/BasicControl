@@ -29,22 +29,20 @@ SIMULATION_PARAM SimulationParams;
 
 MODEL_PARAM ModelParams;
 PID_PARAM   RegulatorPID;
-FILE        *ModelTest_file;
+LOG_FILE_PARAM ModelTest_log;
 
 MODEL_PARAM ModelWindupParams;
 PID_PARAM   RegulatorWindupPID;
-FILE        *ModelWindupTest_file;
+LOG_FILE_PARAM ModelWindupTest_log;
 
 MODEL_PARAM ModelPureParams;
 PID_PARAM RegulatorPurePID;
-FILE        *ModelPureTest_file;
+LOG_FILE_PARAM ModelPureTest_log;
 
 
 
 int main(int argc, char *argv[])
 {
- char *input_filename;
- char *output_filename;
 
  INIT_TEST_VALUES init_values;
  INIT_TEST_VALUES init_windup_values;

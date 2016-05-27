@@ -12,126 +12,53 @@
 #include "common.h"
 #include "file_lib.h"
 
-STATUS output_file_init(IN char* filename, IO FILE **output_file)
-{
 
-	char buff[MAX_STR_LEN];
-
-	//sprawdzamy poprawnosc parametrów wejsciowych
-
-	//NULL pointery
-	if((NULL == filename)|| (NULL == output_file))
-	{
-		return STATUS_PTR_ERROR;
-	}
-
-	//poprawnosc nazwy pliku
-	if((MAX_STR_LEN <= strlen(filename)) || (0 == strlen(filename)))
-	{
-		return STATUS_FAILURE;
-	}
-
-	*output_file = fopen(filename,"w");
-	if(NULL != *output_file)
-	{
-		printf("Otworto plik wynikowy...\n");
-		//tworzymy nag³owki kolumn
-		sprintf(buff, "Czas[s], SetPoint[-], Wyjscie[-],Wyjscie Pure[-], Wyjscie Ref[-], Sterowanie[-] \n");
-		fputs(buff, *output_file);
-		return STATUS_SUCCESS;
-	}
-	else
-	{
-		printf("Nie udalo sie otworzyc pliku wynikowego...\n");
-		return STATUS_FAILURE;
-	}
-
-}
-
-STATUS output_file_close(FILE *output_file)
-{
-
-	if(NULL == output_file)
-	{
-		return STATUS_PTR_ERROR;
-	}
-
-	if(!fclose(output_file))
-	{
-		printf("Zamknieto plik wynikowy.\n");
-		return STATUS_SUCCESS;
-	}
-	else
-	{
-		printf("Nie udalo sie zamknac pliku wynikowego.\n");
-		return STATUS_FAILURE;
-	}
-}
-
-
-
-STATUS output_file_write(FILE *output_file,
-		double Tsym,
-		double SP,
-		double output,
-		double outputPure,
-		double outputRef,
-		double CS)
-{
- char buff[MAX_STR_LEN];
-
- if(output_file)
-  {
-	 sprintf(buff, "%.4f,%.3f,%.3f,%.3f,%.3f,%2.3f\n",Tsym,SP,output,outputPure,outputRef,CS);
-	 fputs(buff, output_file);
-	 //remove \0 z konca linii
-	 return STATUS_SUCCESS;
-  }
-
-return STATUS_FAILURE;
-
-}
-
-STATUS log_file_init(IN char* filename, IO FILE **log_file)
+STATUS log_init(IN INIT_LOG_PARAM init_param,
+		        IO LOG_PARAM *log)
 {
 	char buff[MAX_STR_LEN];
 
 	//sprawdzamy poprawnosc parametrów wejsciowych
 
 	//NULL pointery
-	if((NULL == filename)|| (NULL == log_file))
+	if((NULL == init_param.filename)|| (NULL == log))
 	{
 		return STATUS_PTR_ERROR;
 	}
 
 	//poprawnosc nazwy pliku
-	if((MAX_STR_LEN <= strlen(filename)) || (0 == strlen(filename)))
+	if((MAX_STR_LEN <= strlen(init_param.filename)) || \
+	   (0 == strlen(init_param.filename)))
 	{
 		return STATUS_FAILURE;
 	}
 
-	*log_file = fopen(filename,"w");
-	if(NULL != *log_file)
+	log->file = fopen(init_param.filename,"w");
+	if(NULL != log->file)
 	{
-		printf("Otworto plik z logiem: %s.\n",filename);
+		printf("Otworto plik z logiem: %s.\n",init_param.filename);
 		//tworzymy nag³owki kolumn
-		sprintf(buff, "Czas[s], SetPoint[-],Wyjscie[-],Sterowanie[-],Uchyb[-],CalkaUchyb[-],RozniczkaUchyb[-],P[-],I[-],D[-],es[-],Calka_es[-]\n");
-		fputs(buff, *log_file);
+		sprintf(buff, "Czas[s],SetPoint[-],Wyjscie[-],Sterowanie[-],Uchyb[-],CalkaUchyb[-],RozniczkaUchyb[-],P[-],I[-],D[-],es[-],Calka_es[-]\n");
+		fputs(buff, log->file);
 		return STATUS_SUCCESS;
 	}
    return STATUS_FAILURE;
 }
 
 
-STATUS log_file_write(IO FILE *output_file,
-		              IN SIMULATION_PARAM *simulation,
-					  IN PID_PARAM *regulator,
-					  IN MODEL_PARAM *model)
+STATUS log_write(IO LOG_PARAM *log,
+		         IN SIMULATION_PARAM *simulation,
+				 IN PID_PARAM *regulator,
+				 IN MODEL_PARAM *model)
 {
 	 char buff[MAX_STR_LEN];
 
-	 if(output_file)
-	  {
+	 if((NULL == log) || (NULL == log->file))
+	 {
+		 return STATUS_PTR_ERROR;
+	 }
+	 else
+     {
 		 sprintf(buff, "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\n",
 				 (simulation->Runtime.akt_Tsym),
 				 (simulation->Runtime.akt_SP),
@@ -146,7 +73,7 @@ STATUS log_file_write(IO FILE *output_file,
 				 (regulator->Runtime.es),
 				 (regulator->Runtime.calka_es)
 		       );
-		 fputs(buff, output_file);
+		 fputs(buff, log->file);
 		 //remove \0 z konca linii
 		 return STATUS_SUCCESS;
 	  }
@@ -154,15 +81,15 @@ STATUS log_file_write(IO FILE *output_file,
 	 return STATUS_FAILURE;
 }
 
-STATUS log_file_close(FILE *log_file)
+STATUS log_close(LOG_PARAM *log)
 {
 
-	if(NULL == log_file)
+	if((NULL == log) || (NULL == log->file))
 	{
 		return STATUS_PTR_ERROR;
 	}
 
-	if(!fclose(log_file))
+	if(!fclose(log->file))
 	{
 		printf("Zamknieto plik loga.\n");
 		return STATUS_SUCCESS;

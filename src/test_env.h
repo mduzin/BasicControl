@@ -19,6 +19,7 @@
 #include "sim_env.h"
 #include "regulator_PID.h"
 #include "model_1.h"
+#include "file_lib.h"
 
 
 /** @brief typy funcji zwiazane z sygnalami wejsciowymi */
@@ -34,7 +35,7 @@ typedef struct _INIT_TEST_VALUES
 	INIT_SIMULATION_PARAM sim;
 	INIT_PID_PARAM        pid;
 	INIT_MODEL_PARAM      model;
-	char*                 log_file_name;
+	INIT_LOG_PARAM        log;
 }INIT_TEST_VALUES;
 
 /** @brief typy funkcji powiazane z regulatorem*/
@@ -93,6 +94,24 @@ typedef STATUS (*SIM_ENV_INPUT_SIGNAL)(
 		);
 
 
+/** @brief typy funkcji powiazane z logowaniem*/
+typedef STATUS (*LOG_INIT)(
+		IN INIT_LOG_PARAM init_param,
+        IO LOG_PARAM *log
+   );
+
+typedef STATUS (*LOG_CLOSE)(
+		IN LOG_PARAM *log
+   );
+
+typedef STATUS (*LOG_WRITE)(
+		IO LOG_PARAM *log,
+		IN SIMULATION_PARAM *simulation,
+		IN PID_PARAM *regulator,
+		IN MODEL_PARAM *model
+   );
+
+
 
 /**Zbiory typow funcji*/
 
@@ -111,11 +130,20 @@ typedef struct _MODEL_1_FUNC
 {
 
  MODEL_RUN_EQUATION Run; //glowna funkcja modelu obiektu
- MODEL_INIT Init;        //funkcja inicjalizujaca model obiektu
+ MODEL_INIT  Init;        //funkcja inicjalizujaca model obiektu
  MODEL_CLOSE Close;	     //funkcja zwiajaca model obiektu
 
 } MODEL_1_FUNC;
 
+
+typedef struct _LOG_FUNC
+{
+
+ LOG_WRITE Write;   //zapisz wiersza logu
+ LOG_INIT  Init;     //funkcja inicjalizujaca log
+ LOG_CLOSE Close;	//funkcja zwiajaca log
+
+} LOG_FUNC;
 
 
 typedef struct _SIM_ENV_FUNC
