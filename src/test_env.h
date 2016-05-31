@@ -194,6 +194,8 @@ extern SIM_ENV_FUNC sim_func;
 extern PID_FUNC regulator_func;
 //strutura z funkcjami regulatora
 extern MODEL_1_FUNC model_func;
+//strutura z funkcjami loga
+extern LOG_FUNC log_func;
 
 
 #endif /* TEST_ENV_H_ */

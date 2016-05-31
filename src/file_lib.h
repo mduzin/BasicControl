@@ -24,7 +24,7 @@ typedef struct _INIT_LOG_PARAM
 typedef struct _LOG_PARAM
 {
 	char* filename;
-	FILE *file
+	FILE *file;
 }LOG_PARAM;
 
 //Inicjalizacja pliku z logowaniem danych
