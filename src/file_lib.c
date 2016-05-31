@@ -36,7 +36,8 @@ STATUS log_init(IN INIT_LOG_PARAM init_param,
 	log->file = fopen(init_param.filename,"w");
 	if(NULL != log->file)
 	{
-		printf("Otworto plik z logiem: %s.\n",init_param.filename);
+		log->filename = init_param.filename;
+		printf("Otworto plik z logiem: %s.\n",log->filename);
 		//tworzymy nag³owki kolumn
 		sprintf(buff, "Czas[s],SetPoint[-],Wyjscie[-],Sterowanie[-],Uchyb[-],CalkaUchyb[-],RozniczkaUchyb[-],P[-],I[-],D[-],es[-],Calka_es[-]\n");
 		fputs(buff, log->file);
@@ -91,7 +92,7 @@ STATUS log_close(LOG_PARAM *log)
 
 	if(!fclose(log->file))
 	{
-		printf("Zamknieto plik loga.\n");
+		printf("Zamknieto plik loga: %s.\n", log->filename);
 		return STATUS_SUCCESS;
 	}
 	else

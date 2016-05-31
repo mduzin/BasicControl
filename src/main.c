@@ -253,8 +253,9 @@ int main(int argc, char *argv[])
 		 model_func.Run(&SimulationParams,&RegulatorPurePID,&ModelPureParams);
 
 		 //zapis do pliku wynikow kroku symulacji
-		 //log_file_write(ModelTest_file,&SimulationParams,&RegulatorPID,&ModelParams);
-		 //log_file_write(ModelWindupTest_file,&SimulationParams,&RegulatorWindupPID,&ModelWindupParams);
+		 log_func.Write(&ModelTest_log,&SimulationParams,&RegulatorPID,&ModelParams);
+		 log_func.Write(&ModelWindupTest_log,&SimulationParams,&RegulatorWindupPID,&ModelWindupParams);
+		 log_func.Write(&ModelPureTest_log,&SimulationParams,&RegulatorPurePID,&ModelPureParams);
 
 		 //aktualizacja parametrow symulacji, sprawdz czy koniec symulacji
 		 if(STATUS_SUCCESS != (sim_func.Iter(&SimulationParams)))
@@ -272,8 +273,9 @@ int main(int argc, char *argv[])
 	regulator_func.Close(&RegulatorPurePID);
 	regulator_func.Close(&RegulatorWindupPID);
 	sim_func.Close(&SimulationParams);
-	//log_file_close(ModelTest_file);
-	//log_file_close(ModelWindupTest_file);
+	log_func.Close(&ModelTest_log);
+	log_func.Close(&ModelWindupTest_log);
+	log_func.Close(&ModelPureTest_log);
 	return 0;
 }
 
