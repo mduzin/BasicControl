@@ -60,7 +60,6 @@ STATUS regulator_run(SIMULATION_PARAM *simulation,PID_PARAM *regulator,MODEL_PAR
 	if(FALSE == regulator->Pid_On)
 	{
 		regulator->Runtime.CS = simulation->Runtime.akt_SP;
-
 	}
 	else
 	{
@@ -86,7 +85,6 @@ STATUS regulator_run(SIMULATION_PARAM *simulation,PID_PARAM *regulator,MODEL_PAR
 				regulator->Runtime.calka_es =  regulator->Runtime.prev_calka_es + (regulator->Tp/2.0)*(regulator->Runtime.prev_es + regulator->Runtime.es);
 				//oblicz rozniczke
 				regulator->Runtime.rozniczka_e = regulator->Runtime.e - regulator->Runtime.prev_e;
-
 
 
 				//obliczanie CS
