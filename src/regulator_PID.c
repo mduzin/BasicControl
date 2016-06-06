@@ -98,6 +98,8 @@ STATUS regulator_run(SIMULATION_PARAM *simulation,PID_PARAM *regulator,MODEL_PAR
 				if(TRUE == regulator->AntiWindup_sel)
 				{
 				  //Anti-windup algorithm
+				  //Tracking anti-windup, back-calculation
+				  //http://www.scs-europe.net/services/ecms2006/ecms2006%20pdf/107-ind.pdf
 				  regulator->Runtime.I = (regulator->I_sel)? (((1.0/regulator->Ti)*(regulator->Runtime.calka_e))+((1.0/regulator->Tt)*(regulator->Runtime.calka_es))) : (double)0.0;
 				}
 				else
