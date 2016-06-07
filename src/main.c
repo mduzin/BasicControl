@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
 
 
  init_values.sim.Tc = 0.01;
- init_values.sim.Tsym = 400.0;
+ init_values.sim.Tsym = 200.0;
 
  init_values.model.k= 1.0;
  init_values.model.Ts = 4.0;
@@ -197,11 +197,12 @@ int main(int argc, char *argv[])
  init_values.pid.I_sel = TRUE;
  init_values.pid.D_sel = FALSE;
  init_values.pid.AntiWindupV1_sel = FALSE;
+ init_values.pid.AntiWindupV2_sel = FALSE;
  init_values.pid.kp = 0.25;
  init_values.pid.Ti = 3.0;
  init_values.pid.Td = 0.0;
  init_values.pid.Tp = 1.0;
- init_values.pid.Tt = 2.0;
+ init_values.pid.Tt = 5.0;
  init_values.pid.CS_min = -3.0;
  init_values.pid.CS_max = 3.0;
 
@@ -211,19 +212,19 @@ int main(int argc, char *argv[])
  init_windup_values = init_values;
  init_windup_values.pid.AntiWindupV1_sel = TRUE;
 
- init_values.log.filename = "Model1W1.csv";
+ init_windup_values.log.filename = "Model1W1.csv";
 
  //Windup2 model ma wlaczona opcje windupa
  init_windup2_values = init_values;
  init_windup2_values.pid.AntiWindupV2_sel = TRUE;
 
- init_values.log.filename = "Model1W2.csv";
+ init_windup2_values.log.filename = "Model1W2.csv";
 
  //Pure ma tylko wylaczonego PID'a reszta jest ta sama
  init_pure = init_values;
  init_pure.pid.Pid_On = FALSE;
 
- init_values.log.filename = "Model1P.csv";
+ init_pure.log.filename = "Model1P.csv";
 
 
 	printf("Symulacja obiektu I-ego rzedu\n");
