@@ -35,6 +35,10 @@ MODEL_PARAM ModelWindupParams;
 PID_PARAM   RegulatorWindupPID;
 LOG_PARAM ModelWindupTest_log;
 
+MODEL_PARAM ModelWindup2Params;
+PID_PARAM   RegulatorWindup2PID;
+LOG_PARAM ModelWindup2Test_log;
+
 MODEL_PARAM ModelPureParams;
 PID_PARAM RegulatorPurePID;
 LOG_PARAM ModelPureTest_log;
@@ -177,6 +181,7 @@ int main(int argc, char *argv[])
 
  INIT_TEST_VALUES init_values;
  INIT_TEST_VALUES init_windup_values;
+ INIT_TEST_VALUES init_windup2_values;
  INIT_TEST_VALUES init_pure;
 
 
@@ -191,7 +196,7 @@ int main(int argc, char *argv[])
  init_values.pid.P_sel = TRUE;
  init_values.pid.I_sel = TRUE;
  init_values.pid.D_sel = FALSE;
- init_values.pid.AntiWindup_sel = FALSE;
+ init_values.pid.AntiWindupV1_sel = FALSE;
  init_values.pid.kp = 0.25;
  init_values.pid.Ti = 3.0;
  init_values.pid.Td = 0.0;
@@ -204,10 +209,15 @@ int main(int argc, char *argv[])
 
  //Windup model ma wlaczona opcje windupa
  init_windup_values = init_values;
- init_windup_values.pid.AntiWindup_sel = TRUE;
+ init_windup_values.pid.AntiWindupV1_sel = TRUE;
 
- init_values.log.filename = "Model1W.csv";
+ init_values.log.filename = "Model1W1.csv";
 
+ //Windup2 model ma wlaczona opcje windupa
+ init_windup2_values = init_values;
+ init_windup2_values.pid.AntiWindupV2_sel = TRUE;
+
+ init_values.log.filename = "Model1W2.csv";
 
  //Pure ma tylko wylaczonego PID'a reszta jest ta sama
  init_pure = init_values;
@@ -221,6 +231,7 @@ int main(int argc, char *argv[])
 	//inicjalizacja
 	log_func.Init(init_values.log,&ModelTest_log);
 	log_func.Init(init_windup_values.log,&ModelWindupTest_log);
+	log_func.Init(init_windup2_values.log,&ModelWindup2Test_log);
 	log_func.Init(init_pure.log,&ModelPureTest_log);
 
 
@@ -232,6 +243,10 @@ int main(int argc, char *argv[])
 	//Nasz regulator z windupem + obiekt
 	model_func.Init(&init_windup_values.model,&SimulationParams,&ModelWindupParams);
 	regulator_func.Init(&init_windup_values.pid,&SimulationParams,&RegulatorWindupPID);
+
+	//Nasz regulator z windupem2 + obiekt
+	model_func.Init(&init_windup2_values.model,&SimulationParams,&ModelWindup2Params);
+	regulator_func.Init(&init_windup2_values.pid,&SimulationParams,&RegulatorWindup2PID);
 
 	//Tylko obiekt
 	model_func.Init(&init_pure.model,&SimulationParams,&ModelPureParams);
@@ -248,6 +263,9 @@ int main(int argc, char *argv[])
 		 //obiekt+wlaczony regulator z windupem
 		 regulator_func.Run(&SimulationParams,&RegulatorWindupPID,&ModelWindupParams);
 		 model_func.Run(&SimulationParams,&RegulatorWindupPID,&ModelWindupParams);
+		 //obiekt+wlaczony regulator z windupem2
+		 regulator_func.Run(&SimulationParams,&RegulatorWindup2PID,&ModelWindup2Params);
+		 model_func.Run(&SimulationParams,&RegulatorWindup2PID,&ModelWindup2Params);
 		 //obiekt+wylaczony regulator
 		 regulator_func.Run(&SimulationParams,&RegulatorPurePID,&ModelPureParams);
 		 model_func.Run(&SimulationParams,&RegulatorPurePID,&ModelPureParams);
@@ -255,6 +273,7 @@ int main(int argc, char *argv[])
 		 //zapis do pliku wynikow kroku symulacji
 		 log_func.Write(&ModelTest_log,&SimulationParams,&RegulatorPID,&ModelParams);
 		 log_func.Write(&ModelWindupTest_log,&SimulationParams,&RegulatorWindupPID,&ModelWindupParams);
+		 log_func.Write(&ModelWindup2Test_log,&SimulationParams,&RegulatorWindup2PID,&ModelWindup2Params);
 		 log_func.Write(&ModelPureTest_log,&SimulationParams,&RegulatorPurePID,&ModelPureParams);
 
 		 //aktualizacja parametrow symulacji, sprawdz czy koniec symulacji
@@ -269,12 +288,15 @@ int main(int argc, char *argv[])
 	model_func.Close(&ModelParams);
 	model_func.Close(&ModelPureParams);
 	model_func.Close(&ModelWindupParams);
+	model_func.Close(&ModelWindup2Params);
 	regulator_func.Close(&RegulatorPID);
 	regulator_func.Close(&RegulatorPurePID);
 	regulator_func.Close(&RegulatorWindupPID);
+	regulator_func.Close(&RegulatorWindup2PID);
 	sim_func.Close(&SimulationParams);
 	log_func.Close(&ModelTest_log);
 	log_func.Close(&ModelWindupTest_log);
+	log_func.Close(&ModelWindup2Test_log);
 	log_func.Close(&ModelPureTest_log);
 	return 0;
 }

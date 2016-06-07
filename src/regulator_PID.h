@@ -21,7 +21,8 @@ typedef struct _INIT_PID_PARAM
   BOOL P_sel;
   BOOL I_sel;
   BOOL D_sel;
-  BOOL AntiWindup_sel;
+  BOOL AntiWindupV1_sel;
+  BOOL AntiWindupV2_sel;
   double kp;
   double Ti;
   double Td;
@@ -68,7 +69,8 @@ typedef struct _PID_PARAM
  BOOL P_sel;
  BOOL I_sel;
  BOOL D_sel;
- BOOL AntiWindup_sel;
+ BOOL AntiWindupV1_sel;	//Tracking anti-windup, back-calculation
+ BOOL AntiWindupV2_sel; //Integrator clamping
  double kp;
  double Ti;
  double Td;
@@ -80,7 +82,8 @@ typedef struct _PID_PARAM
 				   Run 	       :1,
 				   Stop		   :1,
 				   Error	   :1,
-				   Reserved    :5;
+				   Saturation  :1,
+				   Reserved    :4;
  RUNTIME_PID_PARAM Runtime;
 
 } PID_PARAM;
