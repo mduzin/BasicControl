@@ -95,7 +95,7 @@ STATUS rectangle_signal(SIMULATION_PARAM *simulation)
     		 output = 4.0;
     		 break;
     	 case 1:
-    		 output = 0.0;
+    		 output = -4.0;
     		 break;
     	 default:
     		 output = 0.0;
@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
  init_values.pid.D_sel = FALSE;
  init_values.pid.AntiWindupV1_sel = FALSE;
  init_values.pid.AntiWindupV2_sel = FALSE;
- init_values.pid.kp = 0.25;
+ init_values.pid.kp = 0.75;
  init_values.pid.Ti = 3.0;
  init_values.pid.Td = 0.0;
  init_values.pid.Tp = 1.0;

@@ -10,6 +10,8 @@
 #include "sim_env.h"
 #include "model_1.h"
 
+//Jesli aktualna probka rowna sie maksymalnej ilosci probek to wyznaczamy nowy CS
+#define CalculateNewControlSignal(CurrentSample,MaxSample) (0 == (CurrentSample)%(MaxSample))
 
 STATUS regulator_init(IN INIT_PID_PARAM *init_values,
 		              IN SIMULATION_PARAM *SimulationParams,
@@ -18,21 +20,21 @@ STATUS regulator_init(IN INIT_PID_PARAM *init_values,
 	STATUS status = STATUS_SUCCESS;
 
 	//parametry regulatora
-	regulator->Pid_On         = init_values->Pid_On; //wl/wyl algorytm regualacji
-	regulator->P_sel          = init_values->P_sel;
-	regulator->I_sel          = init_values->I_sel;
-	regulator->D_sel          = init_values->D_sel;
+	regulator->Pid_On           = init_values->Pid_On; //wl/wyl algorytm regualacji
+	regulator->P_sel            = init_values->P_sel;
+	regulator->I_sel            = init_values->I_sel;
+	regulator->D_sel            = init_values->D_sel;
 	regulator->AntiWindupV1_sel = init_values->AntiWindupV1_sel;
 	regulator->AntiWindupV2_sel = init_values->AntiWindupV2_sel;
-	regulator->Tp             = init_values->Tp; 	//probkowanie regulatora [s]
-	regulator->Ti             = init_values->Ti;	//czas zdwojenia [s]
-	regulator->Td             = init_values->Td;	//stala rozniczkowania
-	regulator->Tt             = init_values->Tt;	//anti-windup tracking time
-	regulator->kp             = init_values->kp;	//wzmocnienie regulatora
+	regulator->Tp               = init_values->Tp; 	//probkowanie regulatora [s]
+	regulator->Ti               = init_values->Ti;	//czas zdwojenia [s]
+	regulator->Td               = init_values->Td;	//stala rozniczkowania
+	regulator->Tt               = init_values->Tt;	//anti-windup tracking time
+	regulator->kp               = init_values->kp;	//wzmocnienie regulatora
 
 	//ograniczenie wyjscia regulatora
-	regulator->CS_max = init_values->CS_max;
-	regulator->CS_min = init_values->CS_min;
+	regulator->CS_max           = init_values->CS_max;
+	regulator->CS_min           = init_values->CS_min;
 
 	//parametry dynamiczne
 	regulator->Runtime.e             = 0.0;	 //	aktualny uchyb
@@ -61,12 +63,13 @@ STATUS regulator_run(SIMULATION_PARAM *simulation,PID_PARAM *regulator,MODEL_PAR
 	if(FALSE == regulator->Pid_On)
 	{
 		regulator->Runtime.CS = simulation->Runtime.akt_SP;
+		return STATUS_SUCCESS;
 	}
-	else
+
+
+    //sprawdzamy ktora mamy probke/iteracje symulacji
+	if (CalculateNewControlSignal(simulation->Runtime.akt_pr_Tsym,regulator->Runtime.il_pr_CS))
 	{
-      //sprawdzamy ktora mamy probke/iteracje symulacji
-	  if (0 == (simulation->Runtime.akt_pr_Tsym)%(regulator->Runtime.il_pr_CS))
-	  {
 		//obliczmy nowy CS
         //przepisz poprzednie wartosci
 		regulator->Runtime.prev_e = regulator->Runtime.e;
@@ -153,10 +156,7 @@ STATUS regulator_run(SIMULATION_PARAM *simulation,PID_PARAM *regulator,MODEL_PAR
 		//printf("Nowy CS:@ %f, CS: %3.3f, e: %3.3f calka_e: %3.3f\n",simulation->Runtime.akt_Tsym,regulator->Runtime.CS, regulator->Runtime.e,regulator->Runtime.calka_e);
 
 
-	    }
-
 	}
-
 
  return STATUS_SUCCESS;
 }
