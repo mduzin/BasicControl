@@ -15,6 +15,9 @@
 /** Generic HANDLE definition */
 typedef void * HANDLE;
 
+/** UINT8 type definition */
+typedef unsigned char UINT8;
+
 /** BOOLEAN definition, using natural variable */
 typedef int BOOLEAN;
 /** BOOLEAN definition, using natural variable */
@@ -50,6 +53,10 @@ typedef int BOOL;
 #define FLG_CLRD 0
 #endif
 
+
+#define IDX_TO_MAP(Idx) ((0x1) << (Idx))
+#define RMV_IDX_FROM_MAP(Idx) (~(IDX_TO_MAP(Idx)))
+#define IS_IDX_SET_IN_MAP(Idx,Map) (0 != ((Map) & IDX_TO_MAP(IDX)))
 
 #define DIV_ROUND_CLOSEST(x, divisor)(          \
 {                      						    \
