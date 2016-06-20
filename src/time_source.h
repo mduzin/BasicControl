@@ -9,6 +9,7 @@
 #define TIME_SOURCE_H_
 
 #include "common.h"
+#include "time_observer.h"
 
 /*time events*/
 //TE_BOT     - Time Event: Begin of time
@@ -26,10 +27,15 @@
 #define TE_1000MS (1 << 5)
 #define TE_EOT    (1 << 6)
 
+#define NO_EVENT   0
 
+//Dodanie do listy nastepnego obserwatora
+STATUS attach(IN TIME_OBSERVER* Observer, UINT8 Event_id);
 
-//STATUS attach(IO TimeObserver* observer, UINT8 event_id;
-//STATUS detach(IN TimeObserver* observer);
+//Usuniecie z listy obserwatora
+STATUS detach(IN TIME_OBSERVER* Observer);
+
+<TODO:>
 //STATUS modify(IN TimeObserver* observer,UINT8 event_id);
 
 #endif /* TIME_SOURCE_H_ */
