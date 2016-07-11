@@ -25,7 +25,7 @@ NODE Tail;
 STATUS attach(IN TIME_OBSERVER* Observer, UINT8 Event_id);
 STATUS detach(IN TIME_OBSERVER* Observer);
 static void TimeTick(void);
-static LINKED_LIST Observers;
+static LINKED_LIST Observers;		//Lista z handles do poszczegolnych obserwatorow
 
 //minimalny tick naszego zegara
 //w zaleznosci od implementacji moze to byc licznik
@@ -34,7 +34,7 @@ static LINKED_LIST Observers;
 static void TimeTick(void)
 {
  UINT8 Events = NO_EVENT;		    //zmienna lokalna z wszystkimi time eventami jakie wystapily w tym wywolaniu
- UINT8 EventsFiltered = NO_EVENT;  //time eventy zmaskowane z observatorem ktorego bedziemy notyfikowac (filtrujemy po to zeby nie informawac o eventach na ktore observawtor sie nie rejestrowal)
+ UINT8 EventsFiltered = NO_EVENT;   //time eventy zmaskowane z observatorem ktorego bedziemy notyfikowac (filtrujemy po to zeby nie informawac o eventach na ktore observawtor sie nie rejestrowal)
  struct LINKED_LIST* Node = Observers.Head;
 
  //logika tick'a zegar
