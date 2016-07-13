@@ -28,10 +28,9 @@ typedef struct _LINKED_LIST
   NODE *Current;
 } LINKED_LIST;
 
-typedef struct _NODE* NODE_PTR;
-typedef struct _LINKED_LIST* LINKED_LIST_PTR;
 
-void InitializeList(LINKED_LIST_PTR List)
+
+void InitializeList(struct _LINKED_LIST* List)
 {
  List->Head = NULL;
  List->Tail = NULL;
@@ -39,7 +38,7 @@ void InitializeList(LINKED_LIST_PTR List)
 }
 
 //Kolejne elementy dodajemy zawsze na koncu kolejki
-void AddItem(LINKED_LIST_PTR List, void* Data)
+void AddItem(struct _LINKED_LIST* List, void* Data)
 {
   NODE_PTR Item = (NODE_PTR)malloc(sizeof(NODE));
   if(NULL != Item)
@@ -65,12 +64,8 @@ void AddItem(LINKED_LIST_PTR List, void* Data)
 
 }
 
-NODE_PTR GetNextItem(LINKED_LIST_PTR List)
-{
-
-
-}
-
+//<TODO:> Do zaimplemtowania w przyszlosci
+/*NODE_PTR GetNextItem(LINKED_LIST_PTR List)
 void RemoveItem(LINKED_LIST_PTR, NODE_PTR);
-NODE_PTR SeekItem(LINKED_LIST_PTR, int Index);
+NODE_PTR SeekItem(LINKED_LIST_PTR, int Index);*/
 
