@@ -13,7 +13,7 @@ typedef struct _TIME_OBSERVER
 {
    void*                   Instance;
    TIME_EVENT              Event;
-   TIME_EVENT_NOTIFICATION notification_callback;
+   TIME_EVENT_NOTIFICATION Callback;
 } TIME_OBSERVER;
 
 TIME_EVENT ObserverGetEvent(IN TIME_OBSERVER_PTR Observer)
@@ -22,5 +22,5 @@ TIME_EVENT ObserverGetEvent(IN TIME_OBSERVER_PTR Observer)
 }
 TIME_EVENT_NOTIFICATION ObserverGetCallback(IN TIME_OBSERVER_PTR Observer)
 {
-   return Observer->notification_callback;
+   return Observer->Callback;
 }

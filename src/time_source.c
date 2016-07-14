@@ -26,9 +26,47 @@ static void TimeTick(void);
 
 //globalne zmienne
 static TIME_OBSERVER_PTR gObservers[OBSERVERS_NUM];		//Lista z handles do poszczegolnych obserwatorow
+static int Index = 0;
 
 
+STATUS attach(IN TIME_OBSERVER_PTR Observer)
+{
+  if(NULL == Observer)
+  {
+	  return STATUS_PTR_ERROR;
+  }
 
+  if(OBSERVERS_NUM <= Index)
+  {
+	  return STATUS_FAILURE;
+  }
+
+  gObservers[Index] = Observer;
+  return STATUS_SUCCESS;
+
+}
+
+STATUS dettach(IN TIME_OBSERVER_PTR Observer)
+{
+  int ii = 0;
+
+  if(NULL == Observer)
+  {
+	  return STATUS_PTR_ERROR;
+  }
+
+  for(ii = 0 ; OBSERVERS_NUM > ii ; ii++)
+  {
+	  if(gObservers[ii] == Observer)
+	  {
+		  gObservers[ii] = NULL;
+		  return STATUS_SUCCESS;
+	  }
+  }
+
+  return STATUS_FAILURE;
+
+}
 
 
 // Tik zegara, ktory notyfikuje obserwatorow
