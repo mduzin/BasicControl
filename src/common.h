@@ -72,11 +72,23 @@ typedef int BOOL;
 
 #define NO_EVENT   0
 
+typedef enum _TIME_EVENT_INDEX
+{
+   TE_BOT_IDX = 0,
+   TE_10MS_IDX,
+   TE_20MS_IDX,
+   TE_100MS_IDX,
+   TE_500MS_IDX,
+   TE_1000MS_IDX,
+   TE_EOT_IDX,
+   TE_LAST_IDX
+} TIME_EVENT_INDEX;
+
 typedef unsigned char TIME_EVENT;
 
 #define IDX_TO_MAP(Idx) ((0x1) << (Idx))
 #define RMV_IDX_FROM_MAP(Idx) (~(IDX_TO_MAP(Idx)))
-#define IS_IDX_SET_IN_MAP(Idx,Map) (0 != ((Map) & IDX_TO_MAP(IDX)))
+#define IS_IDX_SET_IN_MAP(Idx,Map) (0 != ((Map) & IDX_TO_MAP(Idx)))
 
 #define DIV_ROUND_CLOSEST(x, divisor)(          \
 {                      						    \

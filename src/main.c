@@ -29,19 +29,19 @@ SIMULATION_PARAM SimulationParams;
 
 MODEL_PARAM ModelParams;
 PID_PARAM   RegulatorPID;
-LOG_PARAM ModelTest_log;
+LOG_PARAM   ModelTest_log;
 
 MODEL_PARAM ModelWindupParams;
 PID_PARAM   RegulatorWindupPID;
-LOG_PARAM ModelWindupTest_log;
+LOG_PARAM   ModelWindupTest_log;
 
 MODEL_PARAM ModelWindup2Params;
 PID_PARAM   RegulatorWindup2PID;
-LOG_PARAM ModelWindup2Test_log;
+LOG_PARAM   ModelWindup2Test_log;
 
 MODEL_PARAM ModelPureParams;
-PID_PARAM RegulatorPurePID;
-LOG_PARAM ModelPureTest_log;
+PID_PARAM   RegulatorPurePID;
+LOG_PARAM   ModelPureTest_log;
 
 //Funcje sygnalow wejsciowych sa wywolywane w kazdej iteracji (czyli co okres calkowania)
 //skok jednostkowy

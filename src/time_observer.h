@@ -17,7 +17,7 @@ typedef struct _TIME_OBSERVER* TIME_OBSERVER_PTR;
 //deklaracje funkcji dla ADT obserwatora czasu
 //funkcja zwroci adres z zallokowana w pamieci struktura,
 //ktora nastepnie attachujemy do time_source
-STATUS CreateObserver(OUT TIME_OBSERVER_PTR,
+STATUS CreateObserver(OUT TIME_OBSERVER_PTR Observer,
 		              IN TIME_EVENT Events,
 					  IN TIME_EVENT_NOTIFICATION Callback);
 

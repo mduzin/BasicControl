@@ -16,6 +16,15 @@ typedef struct _TIME_OBSERVER
    TIME_EVENT_NOTIFICATION Callback;
 } TIME_OBSERVER;
 
+//Funkcja zwroci adres z zallokowana w pamieci struktura,
+//ktora nastepnie attachujemy do time_source
+STATUS CreateObserver(OUT TIME_OBSERVER_PTR Observer,
+		              IN TIME_EVENT Events,
+					  IN TIME_EVENT_NOTIFICATION Callback)
+{
+	return STATUS_SUCCESS;
+}
+
 TIME_EVENT ObserverGetEvent(IN TIME_OBSERVER_PTR Observer)
 {
    return Observer->Event;
