@@ -73,7 +73,7 @@ STATUS dettach(IN TIME_OBSERVER_PTR Observer)
 // w zaleznosci od implementacji moze to byc licznik
 // moze to byc select z timeoutem
 // moze to byc sleep itp..
-static void TimeTick(void)
+void TimeTick(void)
 {
  TIME_EVENT Events = NO_EVENT;		    //zmienna lokalna z wszystkimi time eventami jakie wystapily w tym wywolaniu
  TIME_EVENT EventsFiltered = NO_EVENT;  //time eventy zmaskowane z observatorem ktorego bedziemy notyfikowac (filtrujemy po to zeby nie informawac o eventach na ktore observawtor sie nie rejestrowal)

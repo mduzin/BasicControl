@@ -16,5 +16,7 @@ STATUS attach(IN TIME_OBSERVER_PTR Observer);
 //Usuniecie z listy obserwatora
 STATUS detach(IN TIME_OBSERVER_PTR Observer);
 
+//tikniecie zegara
+void TimeTick(void);
 
 #endif /* TIME_SOURCE_H_ */

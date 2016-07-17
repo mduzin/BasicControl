@@ -12,13 +12,9 @@
 #include <math.h>
 
 #include "common.h"
+#include "input_signal.h"
 #include "time_observer.h"
 
-typedef struct _INPUT_SIGNAL
-{
-   double Value;				//aktualna wartosc sygnalu
-
-} INPUT_SIGNAL;
 
 //callbacki
 void rect_singal(void* pInstance, const TIME_EVENT Events)

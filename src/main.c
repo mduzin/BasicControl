@@ -18,6 +18,8 @@
 #include "regulator_PID.h"
 #include "model_1.h"
 #include "test_env.h"
+#include "input_signal.h"
+#include "time_source.h"
 
 //<TODO:> Porobic makra ktore autamtycznie enable/disableuja poszczegolne model+regulator
 /*#define PURE_MODEL_ENABLE
