@@ -77,7 +77,8 @@ static void TimeTick(void)
 {
  TIME_EVENT Events = NO_EVENT;		    //zmienna lokalna z wszystkimi time eventami jakie wystapily w tym wywolaniu
  TIME_EVENT EventsFiltered = NO_EVENT;  //time eventy zmaskowane z observatorem ktorego bedziemy notyfikowac (filtrujemy po to zeby nie informawac o eventach na ktore observawtor sie nie rejestrowal)
- TIME_EVENT_NOTIFICATION Callback = NULL;
+ TIME_EVENT_NOTIFICATION pCallback = NULL;
+ void* pInstance = NULL;
  int index = 0;
 
  //<TODO:>logika tick'a zegar
@@ -92,8 +93,9 @@ static void TimeTick(void)
 	 EventsFiltered = ObserverGetEvent(gObservers[index]) & Events;
 	 if(NO_EVENT != EventsFiltered)
 	 {
-		 Callback = ObserverGetCallback(gObservers[index]);
-		 Callback(EventsFiltered);
+		 pInstance = ObserverGetInstance(gObservers[index]);
+		 pCallback = ObserverGetCallback(gObservers[index]);
+		 pCallback(pInstance,EventsFiltered);
 	 }
 	 else
 	 {

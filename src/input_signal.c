@@ -20,30 +20,42 @@ typedef struct _INPUT_SIGNAL
 
 } INPUT_SIGNAL;
 
-//global
-INPUT_SIGNAL Input;
-
 //callbacki
-void rect_singal(const TIME_EVENT Events)
+void rect_singal(void* pInstance, const TIME_EVENT Events)
 {
+	INPUT_SIGNAL* pInput = NULL;
+
+	if(NULL == pInstance)
+	{
+		return;
+	}
+
+	pInput = (INPUT_SIGNAL*)pInstance;
+
 	if(IS_IDX_SET_IN_MAP(TE_500MS_IDX,Events))
 	{
-		Input.Value = Input.Value * (-1.0);
+		pInput->Value = (pInput->Value) * (-1.0);
 	}
 }
 
+//globale
+INPUT_SIGNAL Input;
+
 
 //tworzenie obiektu Input Signal
-STATUS InputSignalInit(IN INPUT_SIGNAL* Input)
+STATUS InputSignalInit(IN INPUT_SIGNAL* pInput)
 {
 	STATUS Status = STATUS_SUCCESS;
 	TIME_EVENT Events;
 
-	Input->Value = 0.0;
+	//init internal values
+	pInput->Value = 0.0;
+
+	//Register for time observer
 	Events = (TE_20MS |
 			  TE_500MS);
-
-	CreateObserver((void*)Input,Events,rect_singal);
+	//call register API
+	CreateObserver((void*)pInput, Events, rect_singal);
 
 	return Status;
 
