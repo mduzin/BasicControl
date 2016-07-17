@@ -84,6 +84,12 @@ typedef enum _TIME_EVENT_INDEX
    TE_LAST_IDX
 } TIME_EVENT_INDEX;
 
+#define TIME_10MS   (10)
+#define TIME_20MS   (20)
+#define TIME_100MS  (100)
+#define TIME_500MS  (500)
+#define TIME_1000MS (1000)
+
 typedef unsigned char TIME_EVENT;
 
 #define IDX_TO_MAP(Idx) ((0x1) << (Idx))

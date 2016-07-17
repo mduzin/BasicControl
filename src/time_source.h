@@ -17,6 +17,7 @@ STATUS attach(IN TIME_OBSERVER_PTR Observer);
 STATUS detach(IN TIME_OBSERVER_PTR Observer);
 
 //tikniecie zegara
-void TimeTick(void);
+void TimeSourceInit(void);
+void TimeSourceTick(void);
 
 #endif /* TIME_SOURCE_H_ */

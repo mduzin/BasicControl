@@ -15,18 +15,22 @@
 
 #define OBSERVERS_NUM 3
 
-//Dodanie do listy nastepnego obserwatora
-STATUS attach(IN TIME_OBSERVER_PTR Observer);
-//Usuniecie z listy obserwatora
-STATUS detach(IN TIME_OBSERVER_PTR Observer);
 
-//deklaracje funkcji
-//Tik zegara, ktory notyfikuje obserwatorow
-static void TimeTick(void);
+typedef struct _TIME_SOURCE_CTX
+{
+  long Tsym;	  //czas symulacji
+  long Tc;	  //okres  calkowania obiektu !!!! NAJWAZNIEJSZY PARAMETR !!!!!!
+
+  long CurrTsym;//aktualny czas symulacji
+
+} TIME_SOURCE_CTX;
+
 
 //globalne zmienne
+TIME_SOURCE_CTX gTimeCtx;
 static TIME_OBSERVER_PTR gObservers[OBSERVERS_NUM];		//Lista z handles do poszczegolnych obserwatorow
 static int Index = 0;
+
 
 
 STATUS attach(IN TIME_OBSERVER_PTR Observer)
@@ -68,12 +72,19 @@ STATUS dettach(IN TIME_OBSERVER_PTR Observer)
 
 }
 
+void TimeSourceInit(void)
+{
+	  gTimeCtx.Tsym = 1000;	 //czas symulacji [ms]
+	  gTimeCtx.Tc = 10;		 //krok zegara [ms]
+	  gTimeCtx.CurrTsym = 0;
+}
+
 
 // Tik zegara, ktory notyfikuje obserwatorow
 // w zaleznosci od implementacji moze to byc licznik
 // moze to byc select z timeoutem
 // moze to byc sleep itp..
-void TimeTick(void)
+void TimeSourceTick(void)
 {
  TIME_EVENT Events = NO_EVENT;		    //zmienna lokalna z wszystkimi time eventami jakie wystapily w tym wywolaniu
  TIME_EVENT EventsFiltered = NO_EVENT;  //time eventy zmaskowane z observatorem ktorego bedziemy notyfikowac (filtrujemy po to zeby nie informawac o eventach na ktore observawtor sie nie rejestrowal)
@@ -81,28 +92,36 @@ void TimeTick(void)
  void* pInstance = NULL;
  int index = 0;
 
- //<TODO:>logika tick'a zegar
 
- //na podstawie internal danych w zmiennej Event zapalamy bity, jaki event wystapil
- //zeby wiedziec ktorych obserwatorow notyfikowac
- //Events = xxx | yyy | zzz;
-
-
- for(index = 0; index < OBSERVERS_NUM; index++)
+ //Logika tick'a zegar
+ for(; gTimeCtx.CurrTsym < gTimeCtx.Tsym ; gTimeCtx.CurrTsym += gTimeCtx.Tc)
  {
-	 EventsFiltered = ObserverGetEvent(gObservers[index]) & Events;
-	 if(NO_EVENT != EventsFiltered)
+	 if(0 == (gTimeCtx.CurrTsym%TIME_20MS))
 	 {
-		 pInstance = ObserverGetInstance(gObservers[index]);
-		 pCallback = ObserverGetCallback(gObservers[index]);
-		 pCallback(pInstance,EventsFiltered);
+		 Events |= IDX_TO_MAP(TE_20MS_IDX);
 	 }
-	 else
+
+	 if(0 == (gTimeCtx.CurrTsym%TIME_500MS))
 	 {
-		 //no need to notify observer
+		 Events |= IDX_TO_MAP(TE_500MS_IDX);
 	 }
+
+	 //wywo³ywanie callbackow do zajestrowanych obserwatorow
+     for(index = 0; index < OBSERVERS_NUM; index++)
+     {
+	    EventsFiltered = ObserverGetEvent(gObservers[index]) & Events;
+	    if(NO_EVENT != EventsFiltered)
+	    {
+		   pInstance = ObserverGetInstance(gObservers[index]);
+		   pCallback = ObserverGetCallback(gObservers[index]);
+		   pCallback(pInstance,EventsFiltered);
+	    }
+	    else
+	    {
+		   //no need to notify observer
+	    }
+     }
+
  }
-
-
 
 }
