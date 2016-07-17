@@ -45,6 +45,9 @@ MODEL_PARAM ModelPureParams;
 PID_PARAM   RegulatorPurePID;
 LOG_PARAM   ModelPureTest_log;
 
+
+INPUT_SIGNAL Input;
+
 //Funcje sygnalow wejsciowych sa wywolywane w kazdej iteracji (czyli co okres calkowania)
 //skok jednostkowy
 STATUS step_signal(SIMULATION_PARAM *simulation)
@@ -256,7 +259,7 @@ int main(int argc, char *argv[])
 	regulator_func.Init(&init_pure.pid,&SimulationParams,&RegulatorPurePID);
 
 	//petla iteracji symulacji obiektu
-	while(TRUE)
+	/*while(TRUE)
 	{
 		//wywolaj równania sygnalu wejsciowego, regulator i modelu obiektu
 		 sim_func.Input(&SimulationParams);
@@ -283,7 +286,11 @@ int main(int argc, char *argv[])
 		 if(STATUS_SUCCESS != (sim_func.Iter(&SimulationParams)))
 		    break;
 
-	}
+	}*/
+
+	TimeSourceInit();
+	InputSignalInit(&Input);
+	TimeSourceTick();
 
 
 	//koniec symulacji - zwijamy sie

@@ -109,16 +109,19 @@ void TimeSourceTick(void)
 	 //wywo³ywanie callbackow do zajestrowanych obserwatorow
      for(index = 0; index < OBSERVERS_NUM; index++)
      {
-	    EventsFiltered = ObserverGetEvent(gObservers[index]) & Events;
-	    if(NO_EVENT != EventsFiltered)
+	    if(NULL != gObservers[index])
 	    {
-		   pInstance = ObserverGetInstance(gObservers[index]);
-		   pCallback = ObserverGetCallback(gObservers[index]);
-		   pCallback(pInstance,EventsFiltered);
-	    }
-	    else
-	    {
-		   //no need to notify observer
+    	   EventsFiltered = ObserverGetEvent(gObservers[index]) & Events;
+	       if(NO_EVENT != EventsFiltered)
+	       {
+		      pInstance = ObserverGetInstance(gObservers[index]);
+		      pCallback = ObserverGetCallback(gObservers[index]);
+		      pCallback(pInstance,EventsFiltered);
+	       }
+	       else
+	       {
+		      //no need to notify observer
+	       }
 	    }
      }
 

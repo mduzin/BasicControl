@@ -28,14 +28,17 @@ void rect_singal(void* pInstance, const TIME_EVENT Events)
 
 	pInput = (INPUT_SIGNAL*)pInstance;
 
+	if(IS_IDX_SET_IN_MAP(TE_20MS_IDX,Events))
+	{
+	   printf("Event 20ms\n");
+	}
+
 	if(IS_IDX_SET_IN_MAP(TE_500MS_IDX,Events))
 	{
+		printf("Event 500ms\n");
 		pInput->Value = (pInput->Value) * (-1.0);
 	}
 }
-
-//globale
-INPUT_SIGNAL Input;
 
 
 //tworzenie obiektu Input Signal
