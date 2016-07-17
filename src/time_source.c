@@ -74,7 +74,7 @@ STATUS dettach(IN TIME_OBSERVER_PTR Observer)
 
 void TimeSourceInit(void)
 {
-	  gTimeCtx.Tsym = 1000;	 //czas symulacji [ms]
+	  gTimeCtx.Tsym = 1000;//czas symulacji [ms]
 	  gTimeCtx.Tc = 10;		 //krok zegara [ms]
 	  gTimeCtx.CurrTsym = 0;
 }
@@ -96,12 +96,15 @@ void TimeSourceTick(void)
  //Logika tick'a zegar
  for(; gTimeCtx.CurrTsym < gTimeCtx.Tsym ; gTimeCtx.CurrTsym += gTimeCtx.Tc)
  {
-	 if(0 == (gTimeCtx.CurrTsym%TIME_20MS))
+	 Events = NO_EVENT;
+	 EventsFiltered = NO_EVENT;
+
+	 if(0 == (gTimeCtx.CurrTsym % TIME_20MS))
 	 {
 		 Events |= IDX_TO_MAP(TE_20MS_IDX);
 	 }
 
-	 if(0 == (gTimeCtx.CurrTsym%TIME_500MS))
+	 if(0 == (gTimeCtx.CurrTsym % TIME_500MS))
 	 {
 		 Events |= IDX_TO_MAP(TE_500MS_IDX);
 	 }
