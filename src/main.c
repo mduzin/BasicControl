@@ -56,63 +56,7 @@ STATUS step_signal(SIMULATION_PARAM *simulation)
 	return STATUS_SUCCESS;
 }
 
-//sygnal prostokatny
-STATUS rectangle_signal(SIMULATION_PARAM *simulation)
-{
-	double period = 25.0;  		 //czas co jaki zmieniamy stan wyjscia
-	static double acc_period = 0.0; //zliczony czas trawania stanu
-    static int state = 0;
-    double output;
 
-
-    if(0.0 != simulation->Runtime.akt_Tsym)
-   	 {
-   		 //dzialamy jest czas symulacji jest wiekszy od 0.0
-
-   		 //zliczony czas period jest wiekszy-rowny od trwania period = zmiana stanu
-   		 if(acc_period >= period)
-   		 {
-
-   			 //zmiana stanu
-   			 if(++state > 2)
-   			 {
-   				//po stanie 4 wracamy do stanu 0
-   				 state = 0;
-   			 }
-
-   			 //byla zmiana stanu wiec wyzeruj zliczony period(acc_period)
-   			 acc_period = 0.0;
-   		 }
-   		 else
-   		 {
-   			 //nie ma zmiany stanu tylko zwieksz acc_period
-   			 acc_period += simulation->Tc;
-   		 }
-   	 }
-   	 else
-   	 {
-   		//inicjalizacja maszynki (simulation->Runtime.akt_Tsym == 0)
-   		 state = 0;
-   	 }
-    switch(state)
-    	 {
-    	 case 0:
-    		 output = 4.0;
-    		 break;
-    	 case 1:
-    		 output = -4.0;
-    		 break;
-    	 default:
-    		 output = 0.0;
-    		 break;
-    	 }
-
-    	//wystaw do globalnej zmiennej symulacji
-    	simulation->Runtime.akt_SP = output;
-
-
-	return STATUS_SUCCESS;
-}
 
 //sygnal pila
 STATUS saw_signal(SIMULATION_PARAM *simulation)
