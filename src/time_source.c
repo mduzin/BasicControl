@@ -74,7 +74,7 @@ STATUS dettach(IN TIME_OBSERVER_PTR Observer)
 
 void TimeSourceInit(void)
 {
-	  gTimeCtx.Tsym = 1000;//czas symulacji [ms]
+	  gTimeCtx.Tsym = 100000;  //czas symulacji [ms]
 	  gTimeCtx.Tc = 10;		 //krok zegara [ms]
 	  gTimeCtx.CurrTsym = 0;
 }
@@ -93,38 +93,51 @@ void TimeSourceTick(void)
  int index = 0;
 
  //Logika tick'a zegar
- for(; gTimeCtx.CurrTsym < gTimeCtx.Tsym ; gTimeCtx.CurrTsym += gTimeCtx.Tc)
+ for(; gTimeCtx.CurrTsym <= gTimeCtx.Tsym ; gTimeCtx.CurrTsym += gTimeCtx.Tc)
  {
 	 Events = NO_EVENT;
 	 EventsFiltered = NO_EVENT;
 
-	 if(0 == (gTimeCtx.CurrTsym % TIME_10MS))
- 	 {
- 		Events |= IDX_TO_MAP(TE_10MS_IDX);
- 	 }
-
-	 if(0 == (gTimeCtx.CurrTsym % TIME_20MS))
+	 if(0 == gTimeCtx.CurrTsym)
 	 {
-		Events |= IDX_TO_MAP(TE_20MS_IDX);
+		 Events |= IDX_TO_MAP(TE_BOT_IDX);
+	 }
+	 else
+	 {
+		 if(0 == (gTimeCtx.CurrTsym % TIME_10MS))
+		 {
+		 	Events |= IDX_TO_MAP(TE_10MS_IDX);
+		 }
+
+		 if(0 == (gTimeCtx.CurrTsym % TIME_20MS))
+		 {
+		    Events |= IDX_TO_MAP(TE_20MS_IDX);
+		 }
+
+		 if(0 == (gTimeCtx.CurrTsym % TIME_100MS))
+		 {
+		    Events |= IDX_TO_MAP(TE_100MS_IDX);
+		 }
+
+		 if(0 == (gTimeCtx.CurrTsym % TIME_500MS))
+		 {
+		    Events |= IDX_TO_MAP(TE_500MS_IDX);
+		 }
+
+		 if(0 == (gTimeCtx.CurrTsym % TIME_1000MS))
+		 {
+		     Events |= IDX_TO_MAP(TE_1000MS_IDX);
+		 }
+
+		 if(gTimeCtx.Tsym == gTimeCtx.CurrTsym )
+		 {
+			 Events |= IDX_TO_MAP(TE_EOT_IDX);
+		 }
 	 }
 
-	 if(0 == (gTimeCtx.CurrTsym % TIME_100MS))
-	 {
-		Events |= IDX_TO_MAP(TE_100MS_IDX);
-	 }
-
-	 if(0 == (gTimeCtx.CurrTsym % TIME_500MS))
-	 {
-		Events |= IDX_TO_MAP(TE_500MS_IDX);
-	 }
-
-	 if(0 == (gTimeCtx.CurrTsym % TIME_1000MS))
-	 {
-	    Events |= IDX_TO_MAP(TE_1000MS_IDX);
-	 }
 
 	 //wywo³ywanie callbackow do zajestrowanych obserwatorow
-     for(index = 0; index < OBSERVERS_NUM; index++)
+	 for(index = 0; index < OBSERVERS_NUM; index++)
      {
 	    if(NULL != gObservers[index])
 	    {

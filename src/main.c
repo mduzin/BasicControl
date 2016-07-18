@@ -46,7 +46,7 @@ PID_PARAM   RegulatorPurePID;
 LOG_PARAM   ModelPureTest_log;
 
 
-INPUT_SIGNAL Input;
+INPUT_SIGNAL_RECT InputRect;
 
 //Funcje sygnalow wejsciowych sa wywolywane w kazdej iteracji (czyli co okres calkowania)
 //skok jednostkowy
@@ -289,8 +289,9 @@ int main(int argc, char *argv[])
 	}*/
 
 	TimeSourceInit();
-	InputSignalInit(&Input);
+	RectangleSignalInit(&InputRect);
 	TimeSourceTick();
+
 
 
 	//koniec symulacji - zwijamy sie
