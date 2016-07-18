@@ -72,8 +72,8 @@ STATUS RectangleSignalInit(IN INPUT_SIGNAL_RECT* pInput)
 	}
 
 	//init internal values
-	pInput->Value = 0.0;
-	pInput->InitValue = 1.0;
+	pInput->Value = STEP_SIGNAL_LOW;
+	pInput->InitValue = STEP_SIGNAL_HIGH;
 	pInput->SwitchTime = 5;
 
 
@@ -85,6 +85,47 @@ STATUS RectangleSignalInit(IN INPUT_SIGNAL_RECT* pInput)
 	CreateObserver((void*)pInput, Events, RectangleSignal);
 
 	return Status;
+
+}
+
+STATUS StepSignalInit(IN INPUT_SIGNAL_STEP* pInput)
+{
+	STATUS Status = STATUS_SUCCESS;
+	TIME_EVENT Events;
+
+	if(NULL == pInput)
+	{
+		return STATUS_PTR_ERROR;
+	}
+
+	//init internal values
+	pInput->Value = STEP_SIGNAL_HIGH;
+	pInput->InitValue = STEP_SIGNAL_HIGH;
+
+	//Register events to time observe
+	Events = TE_BOT;
+
+	//call register API
+	CreateObserver((void*)pInput, Events, StepSignal);
+
+	return Status;
+}
+void StepSignal(void* pInstance, const TIME_EVENT Events)
+{
+	INPUT_SIGNAL_RECT* pInput = NULL;
+
+	if(NULL == pInstance)
+	{
+		return;
+	}
+
+	pInput = (INPUT_SIGNAL_RECT*)pInstance;
+
+	if(TRUE == (IS_IDX_SET_IN_MAP(TE_BOT_IDX,Events)))
+	{
+   	    pInput->Value = pInput->InitValue;
+	}
+
 
 }
 

@@ -18,6 +18,13 @@
 #include "time_observer.h"
 
 //<TODO:> Do przerobienia na ADT
+typedef struct _INPUT_SIGNAL_STEP
+{
+   double Value;				//aktualna wartosc sygnalu
+   double InitValue;			//Wartosc poczatkowa sygnalu
+
+} INPUT_SIGNAL_STEP;
+
 typedef struct _INPUT_SIGNAL_RECT
 {
    double Value;				//aktualna wartosc sygnalu
@@ -27,6 +34,9 @@ typedef struct _INPUT_SIGNAL_RECT
    int InternalCounter;			//zmienna wewn.
 
 } INPUT_SIGNAL_RECT;
+
+STATUS StepSignalInit(IN INPUT_SIGNAL_STEP* pInput);
+void StepSignal(void* pInstance, const TIME_EVENT Events);
 
 STATUS RectangleSignalInit(IN INPUT_SIGNAL_RECT* pInput);
 void RectangleSignal(void* pInstance, const TIME_EVENT Events);
