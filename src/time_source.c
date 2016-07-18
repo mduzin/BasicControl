@@ -18,17 +18,17 @@
 
 typedef struct _TIME_SOURCE_CTX
 {
-  long Tsym;	  //czas symulacji
-  long Tc;	  //okres  calkowania obiektu !!!! NAJWAZNIEJSZY PARAMETR !!!!!!
+  long Tsym;	  //Simulation time
+  long Tc;	      //Simulation time step !!!MOST IMPORTANT PARAMETER!!!
 
-  long CurrTsym;//aktualny czas symulacji
+  long CurrTsym; //Current Simulation time
 
 } TIME_SOURCE_CTX;
 
 
-//globalne zmienne
-TIME_SOURCE_CTX gTimeCtx;
-static TIME_OBSERVER_PTR gObservers[OBSERVERS_NUM];		//Lista z handles do poszczegolnych obserwatorow
+//GLOBAL VARIABLES
+TIME_SOURCE_CTX          gTimeCtx;
+static TIME_OBSERVER_PTR gObservers[OBSERVERS_NUM];		//Array of pointers to observers
 static int Index = 0;
 
 
@@ -74,25 +74,26 @@ STATUS dettach(IN TIME_OBSERVER_PTR Observer)
 
 void TimeSourceInit(void)
 {
-	  gTimeCtx.Tsym = 100000;  //czas symulacji [ms]
-	  gTimeCtx.Tc = 10;		 //krok zegara [ms]
+	  gTimeCtx.Tsym = 100000;  //Simulation Time [100s]
+	  gTimeCtx.Tc = 10;		   //Time step [10ms]
 	  gTimeCtx.CurrTsym = 0;
 }
 
 
-// Tik zegara, ktory notyfikuje obserwatorow
-// w zaleznosci od implementacji moze to byc licznik
-// moze to byc select z timeoutem
-// moze to byc sleep itp..
+// Time tick and observers notitication
+// Time tick can be implemented as:
+// simple counter
+// posix pselect with timeout
+// sleep function etc.
 void TimeSourceTick(void)
 {
- TIME_EVENT Events = NO_EVENT;		    //zmienna lokalna z wszystkimi time eventami jakie wystapily w tym wywolaniu
- TIME_EVENT EventsFiltered = NO_EVENT;  //time eventy zmaskowane z observatorem ktorego bedziemy notyfikowac (filtrujemy po to zeby nie informawac o eventach na ktore observawtor sie nie rejestrowal)
+ TIME_EVENT Events = NO_EVENT;		    //Events that occured in current iteration
+ TIME_EVENT EventsFiltered = NO_EVENT;  //Events filtered with those on which client was registered
  TIME_EVENT_NOTIFICATION pCallback = NULL;
  void* pInstance = NULL;
  int index = 0;
 
- //Logika tick'a zegar
+ //Time tick logic as simple counter
  for(; gTimeCtx.CurrTsym <= gTimeCtx.Tsym ; gTimeCtx.CurrTsym += gTimeCtx.Tc)
  {
 	 Events = NO_EVENT;
@@ -136,7 +137,7 @@ void TimeSourceTick(void)
 	 }
 
 
-	 //wywo³ywanie callbackow do zajestrowanych obserwatorow
+	 //Invoke callbacks to registered observers
 	 for(index = 0; index < OBSERVERS_NUM; index++)
      {
 	    if(NULL != gObservers[index])
