@@ -92,21 +92,35 @@ void TimeSourceTick(void)
  void* pInstance = NULL;
  int index = 0;
 
-
  //Logika tick'a zegar
  for(; gTimeCtx.CurrTsym < gTimeCtx.Tsym ; gTimeCtx.CurrTsym += gTimeCtx.Tc)
  {
 	 Events = NO_EVENT;
 	 EventsFiltered = NO_EVENT;
 
+	 if(0 == (gTimeCtx.CurrTsym % TIME_10MS))
+ 	 {
+ 		Events |= IDX_TO_MAP(TE_10MS_IDX);
+ 	 }
+
 	 if(0 == (gTimeCtx.CurrTsym % TIME_20MS))
 	 {
-		 Events |= IDX_TO_MAP(TE_20MS_IDX);
+		Events |= IDX_TO_MAP(TE_20MS_IDX);
+	 }
+
+	 if(0 == (gTimeCtx.CurrTsym % TIME_100MS))
+	 {
+		Events |= IDX_TO_MAP(TE_100MS_IDX);
 	 }
 
 	 if(0 == (gTimeCtx.CurrTsym % TIME_500MS))
 	 {
-		 Events |= IDX_TO_MAP(TE_500MS_IDX);
+		Events |= IDX_TO_MAP(TE_500MS_IDX);
+	 }
+
+	 if(0 == (gTimeCtx.CurrTsym % TIME_1000MS))
+	 {
+	    Events |= IDX_TO_MAP(TE_1000MS_IDX);
 	 }
 
 	 //wywo³ywanie callbackow do zajestrowanych obserwatorow
@@ -120,10 +134,6 @@ void TimeSourceTick(void)
 		      pInstance = ObserverGetInstance(gObservers[index]);
 		      pCallback = ObserverGetCallback(gObservers[index]);
 		      pCallback(pInstance,EventsFiltered);
-	       }
-	       else
-	       {
-		      //no need to notify observer
 	       }
 	    }
      }
