@@ -155,7 +155,7 @@ void TimeSourceTick(TIME_SOURCE_CTX_PTR pTimeCtx)
 	 }
 
 
-	 //Invoke callbacks to registered observers
+	 //Invoke callbacks for registered observers
 	 for(index = 0; index < OBSERVERS_NUM; index++)
      {
 	    if(NULL != gObservers[index])
