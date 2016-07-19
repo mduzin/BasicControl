@@ -72,16 +72,24 @@ STATUS dettach(IN TIME_OBSERVER_PTR Observer)
 
 }
 
-void TimeSourceInit(TIME_SOURCE_CTX_PTR pTimeCtx)
+STATUS TimeSourceInit(TIME_SOURCE_CTX_PTR* ppTimeCtx)
 {
-   if(NULL == pTimeCtx)
+   if(NULL == ppTimeCtx)
    {
-	  return;
+	  return STATUS_PTR_ERROR;
    }
 
-   pTimeCtx->Tsym     = 100000;  //Simulation Time [100s]
-   pTimeCtx->Tc       = 10;	     //Time step [10ms]
-   pTimeCtx->CurrTsym = 0;
+   *ppTimeCtx = (TIME_SOURCE_CTX_PTR)malloc(sizeof(TIME_SOURCE_CTX));
+
+   if(NULL == *ppTimeCtx)
+   {
+	   return STATUS_PTR_ERROR;
+   }
+
+   (*ppTimeCtx)->Tsym     = 100000;  //Simulation Time [100s]
+   (*ppTimeCtx)->Tc       = 10;	     //Time step [10ms]
+   (*ppTimeCtx)->CurrTsym = 0;
+   return STATUS_SUCCESS;
 }
 
 

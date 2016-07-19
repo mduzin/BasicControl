@@ -15,15 +15,15 @@
 typedef struct _TIME_SOURCE_CTX* TIME_SOURCE_CTX_PTR;
 
 //API for ADT
-void TimeSourceInit(TIME_SOURCE_CTX_PTR);
-void TimeSourceTick(TIME_SOURCE_CTX_PTR);
-long TimeSourceGetTc(TIME_SOURCE_CTX_PTR);
-long TimeSourceGetCurrTsym(TIME_SOURCE_CTX_PTR);
+STATUS TimeSourceInit(TIME_SOURCE_CTX_PTR*);
+void   TimeSourceTick(TIME_SOURCE_CTX_PTR);
+long   TimeSourceGetTc(TIME_SOURCE_CTX_PTR);
+long   TimeSourceGetCurrTsym(TIME_SOURCE_CTX_PTR);
 
 
-//Dodanie do listy nastepnego obserwatora
+//Add new observer
 STATUS attach(IN TIME_OBSERVER_PTR Observer);
-//Usuniecie z listy obserwatora
+//Remove observer
 STATUS detach(IN TIME_OBSERVER_PTR Observer);
 
 
