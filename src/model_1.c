@@ -10,6 +10,70 @@
 #include "model_1.h"
 #include "regulator_PID.h"
 
+#define NO_DELAY 0.0
+
+typedef struct _FIRST_ORDER_INTERNAL_VARIABLES
+{
+
+  double Integral;	        //zmienna wewnetrzna obiektu na ktorej obliczany ca³kowanie
+
+  /*Zmienne z poprzedniej iteracji symulacji obiektu*/
+  double Prev_y;			//sygnal wyjsciowy
+  double Buff_y;
+  double Prev_Int;	        //zmienna wewnetrzna obiektu na ktorej obliczany ca³kowanie w obiekcie
+
+  double* Delay_array;		//wskaznik na tablice z opoznionymi probkami
+  int     Delay_array_size;	//rozmiar tablicy z opoznionymi probkami
+
+
+} FIRST_ORDER_INTERNAL_VARIABLES;
+
+typedef struct _FIRST_ORDER_MODEL
+{
+   double k;	  //[-] gain
+   double Ts;	  //[s] time constant
+   double Tdelay; //[s] delay
+
+   double u;	  //input value
+   double y;	  //output value
+
+   FIRST_ORDER_INTERNAL_VARIABLES Internal;
+
+}FIRST_ORDER_MODEL;
+
+STATUS FirstOrderModelInit(FIRST_ORDER_MODEL_PTR* ppModel)
+{
+	if(NULL == ppModel)
+	{
+  	   return STATUS_PTR_ERROR;
+	}
+
+	*ppModel = (FIRST_ORDER_MODEL_PTR)malloc(sizeof(FIRST_ORDER_MODEL));
+
+	if(NULL == *ppModel)
+	{
+	   return STATUS_PTR_ERROR;
+	}
+
+	//Model parameters
+	(*ppModel)->k      = 1;		     // gain
+	(*ppModel)->Ts     = 4;		 // time const [s]
+	(*ppModel)->Tdelay = 0.5; // model delay [s]
+
+	//Allocate memory for model delay array
+    if(NO_DELAY != (*ppModel)->Tdelay)
+    {
+
+    }
+
+
+	return STATUS_SUCCESS;
+
+}
+
+STATUS FirstOrderModelRun(FIRST_ORDER_MODEL_PTR pModel);
+STATUS FirstOrderModelClose(FIRST_ORDER_MODEL_PTR pModel);
+
 static void init_delay_array(double *array_ptr,int array_size, double init_val);
 static double shift_delay_array(double *array_ptr,int array_size, int shift);
 static void print_delay_array(double *array_ptr,int array_size);
