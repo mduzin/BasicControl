@@ -48,6 +48,8 @@ LOG_PARAM   ModelPureTest_log;
 
 INPUT_SIGNAL_RECT InputRect;
 
+TIME_SOURCE_CTX_PTR pTimeCtx;
+
 //Funcje sygnalow wejsciowych sa wywolywane w kazdej iteracji (czyli co okres calkowania)
 //skok jednostkowy
 STATUS step_signal(SIMULATION_PARAM *simulation)
@@ -232,10 +234,9 @@ int main(int argc, char *argv[])
 
 	}*/
 
-	TimeSourceInit();
+	TimeSourceInit(&pTimeCtx);
 	RectangleSignalInit(&InputRect);
-	TimeSourceTick();
-
+	TimeSourceTick(pTimeCtx);
 
 
 	//koniec symulacji - zwijamy sie
