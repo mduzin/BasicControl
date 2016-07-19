@@ -72,11 +72,16 @@ STATUS dettach(IN TIME_OBSERVER_PTR Observer)
 
 }
 
-void TimeSourceInit(void)
+void TimeSourceInit(TIME_SOURCE_CTX_PTR pTimeCtx)
 {
-	  gTimeCtx.Tsym = 100000;  //Simulation Time [100s]
-	  gTimeCtx.Tc = 10;		   //Time step [10ms]
-	  gTimeCtx.CurrTsym = 0;
+   if(NULL == pTimeCtx)
+   {
+	  return;
+   }
+
+   pTimeCtx->Tsym     = 100000;  //Simulation Time [100s]
+   pTimeCtx->Tc       = 10;	     //Time step [10ms]
+   pTimeCtx->CurrTsym = 0;
 }
 
 
@@ -85,7 +90,7 @@ void TimeSourceInit(void)
 // simple counter
 // posix pselect with timeout
 // sleep function etc.
-void TimeSourceTick(void)
+void TimeSourceTick(TIME_SOURCE_CTX_PTR pTimeCtx)
 {
  TIME_EVENT Events = NO_EVENT;		    //Events that occured in current iteration
  TIME_EVENT EventsFiltered = NO_EVENT;  //Events filtered with those on which client was registered
@@ -93,44 +98,49 @@ void TimeSourceTick(void)
  void* pInstance = NULL;
  int index = 0;
 
+ if(NULL == pTimeCtx)
+ {
+    return;
+ }
+
  //Time tick logic as simple counter
- for(; gTimeCtx.CurrTsym <= gTimeCtx.Tsym ; gTimeCtx.CurrTsym += gTimeCtx.Tc)
+ for(; pTimeCtx->CurrTsym <= pTimeCtx->Tsym ; pTimeCtx->CurrTsym += pTimeCtx->Tc)
  {
 	 Events = NO_EVENT;
 	 EventsFiltered = NO_EVENT;
 
-	 if(0 == gTimeCtx.CurrTsym)
+	 if(0 == pTimeCtx->CurrTsym)
 	 {
 		 Events |= IDX_TO_MAP(TE_BOT_IDX);
 	 }
 	 else
 	 {
-		 if(0 == (gTimeCtx.CurrTsym % TIME_10MS))
+		 if(0 == (pTimeCtx->CurrTsym % TIME_10MS))
 		 {
 		 	Events |= IDX_TO_MAP(TE_10MS_IDX);
 		 }
 
-		 if(0 == (gTimeCtx.CurrTsym % TIME_20MS))
+		 if(0 == (pTimeCtx->CurrTsym % TIME_20MS))
 		 {
 		    Events |= IDX_TO_MAP(TE_20MS_IDX);
 		 }
 
-		 if(0 == (gTimeCtx.CurrTsym % TIME_100MS))
+		 if(0 == (pTimeCtx->CurrTsym % TIME_100MS))
 		 {
 		    Events |= IDX_TO_MAP(TE_100MS_IDX);
 		 }
 
-		 if(0 == (gTimeCtx.CurrTsym % TIME_500MS))
+		 if(0 == (pTimeCtx->CurrTsym % TIME_500MS))
 		 {
 		    Events |= IDX_TO_MAP(TE_500MS_IDX);
 		 }
 
-		 if(0 == (gTimeCtx.CurrTsym % TIME_1000MS))
+		 if(0 == (pTimeCtx->CurrTsym % TIME_1000MS))
 		 {
 		     Events |= IDX_TO_MAP(TE_1000MS_IDX);
 		 }
 
-		 if(gTimeCtx.Tsym == gTimeCtx.CurrTsym )
+		 if(pTimeCtx->Tsym == pTimeCtx->CurrTsym )
 		 {
 			 Events |= IDX_TO_MAP(TE_EOT_IDX);
 		 }
@@ -154,4 +164,29 @@ void TimeSourceTick(void)
 
  }
 
+}
+
+//API for ADT
+long TimeSourceGetTc(TIME_SOURCE_CTX_PTR pTimeCtx)
+{
+  if(NULL != pTimeCtx)
+  {
+     return pTimeCtx->Tc;
+  }
+  else
+  {
+	 return 0;
+  }
+}
+
+long TimeSourceGetCurrTsym(TIME_SOURCE_CTX_PTR pTimeCtx)
+{
+  if(NULL != pTimeCtx)
+  {
+     return pTimeCtx->CurrTsym;
+  }
+  else
+  {
+	 return 0;
+  }
 }
