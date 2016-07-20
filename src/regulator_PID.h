@@ -14,6 +14,9 @@
 
 #include "common.h"
 
+//ADT
+typedef struct _REG_PID* REG_PID_PTR;
+
 /** @brief parametry inicjalizujace regulatora */
 typedef struct _INIT_PID_PARAM
 {

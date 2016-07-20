@@ -20,8 +20,9 @@ typedef struct _FIRST_ORDER_MODEL* FIRST_ORDER_MODEL_PTR;
 
 //API for ADT
 STATUS FirstOrderModelInit(FIRST_ORDER_MODEL_PTR*);
-STATUS FirstOrderModelRun(FIRST_ORDER_MODEL_PTR);
 STATUS FirstOrderModelClose(FIRST_ORDER_MODEL_PTR);
+void FirstOrderModelRun(void* pInstance, const TIME_EVENT Events);
+
 
 typedef struct _INIT_MODEL_PARAM
 {

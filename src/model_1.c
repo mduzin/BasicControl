@@ -8,6 +8,8 @@
 
 #include "common.h"
 #include "model_1.h"
+#include "time_source.h"
+#include "time_observer.h"
 #include "regulator_PID.h"
 
 #define NO_DELAY 0.0
@@ -38,11 +40,20 @@ typedef struct _FIRST_ORDER_MODEL
    double y;	  //output value
 
    FIRST_ORDER_INTERNAL_VARIABLES Internal;
+   TIME_SOURCE_CTX_PTR pTimeCtx;
+   REG_PID_PTR         pPidCtx;
 
 }FIRST_ORDER_MODEL;
 
+static void init_delay_array(double *array_ptr,int array_size, double init_val);
+static double shift_delay_array(double *array_ptr,int array_size, int shift);
+static void print_delay_array(double *array_ptr,int array_size);
+
 STATUS FirstOrderModelInit(FIRST_ORDER_MODEL_PTR* ppModel)
 {
+	TIME_EVENT Events;
+	long Tdelay_ms = 0;
+
 	if(NULL == ppModel)
 	{
   	   return STATUS_PTR_ERROR;
@@ -56,27 +67,76 @@ STATUS FirstOrderModelInit(FIRST_ORDER_MODEL_PTR* ppModel)
 	}
 
 	//Model parameters
-	(*ppModel)->k      = 1;		     // gain
-	(*ppModel)->Ts     = 4;		 // time const [s]
+	(*ppModel)->k      = 1;	  // gain
+	(*ppModel)->Ts     = 4;	  // time const [s]
 	(*ppModel)->Tdelay = 0.5; // model delay [s]
+	(*ppModel)->u      = 1;
+	(*ppModel)->y     = 0;
 
 	//Allocate memory for model delay array
     if(NO_DELAY != (*ppModel)->Tdelay)
     {
+    	Tdelay_ms =((long)(*ppModel)->Tdelay)* 1000;
 
+    	(*ppModel)->Internal.Delay_array_size = (int)DIV_ROUND_CLOSEST(Tdelay_ms, TimeSourceGetTc((*ppModel)->pTimeCtx));
+    	(*ppModel)->Internal.Delay_array = (double*)malloc((*ppModel)->Internal.Delay_array_size * sizeof(double));
+    	if(NULL == (*ppModel)->Internal.Delay_array)
+    	{
+    	   return STATUS_PTR_ERROR;
+    	}
+    	else
+    	{
+    	   init_delay_array((*ppModel)->Internal.Delay_array,(*ppModel)->Internal.Delay_array_size, 0.0);
+  	    }
     }
 
+
+    //Internal variables
+    (*ppModel)->Internal.Prev_y   = 0.0;
+    (*ppModel)->Internal.Integral = 0.0;
+    (*ppModel)->Internal.Prev_Int = 0.0;
+
+    //Register events to time observe
+   	Events = (TE_BOT |
+   			  TE_10MS);
+
+    //call register API
+    CreateObserver((void*)(*ppModel), Events, FirstOrderModelRun);
 
 	return STATUS_SUCCESS;
 
 }
 
-STATUS FirstOrderModelRun(FIRST_ORDER_MODEL_PTR pModel);
-STATUS FirstOrderModelClose(FIRST_ORDER_MODEL_PTR pModel);
+void FirstOrderModelRun(void* pInstance, const TIME_EVENT Events)
+{
 
-static void init_delay_array(double *array_ptr,int array_size, double init_val);
-static double shift_delay_array(double *array_ptr,int array_size, int shift);
-static void print_delay_array(double *array_ptr,int array_size);
+	FIRST_ORDER_MODEL_PTR pModel = NULL;
+
+	if(NULL == pInstance)
+	{
+	   return;
+	}
+
+	pModel = (FIRST_ORDER_MODEL*)pInstance;
+
+
+    if((NULL == pModel->pTimeCtx) || (NULL == pModel->pPidCtx))
+    {
+	   return;
+    }
+
+}
+
+
+STATUS FirstOrderModelClose(FIRST_ORDER_MODEL_PTR pModel)
+{
+	free(pModel->Internal.Delay_array);
+	free(pModel);
+	pModel = NULL;
+	return STATUS_SUCCESS;
+}
+
+
 
 
 STATUS model_init(IN INIT_MODEL_PARAM *init_values,SIMULATION_PARAM *simulation, OUT MODEL_PARAM *model)
