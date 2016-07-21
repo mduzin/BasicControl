@@ -36,8 +36,9 @@ typedef struct _FIRST_ORDER_MODEL
    double Ts;	  //[s] time constant
    double Tdelay; //[s] delay
 
-   double u;	  //input value
-   double y;	  //output value
+   double u;	      //input value
+   double y;	      //output value
+   double y_delayed;  //output value for model with delay
 
    FIRST_ORDER_INTERNAL_VARIABLES Internal;
    TIME_SOURCE_CTX_PTR pTimeCtx;
@@ -111,6 +112,7 @@ void FirstOrderModelRun(void* pInstance, const TIME_EVENT Events)
 {
 
 	FIRST_ORDER_MODEL_PTR pModel = NULL;
+	double  Tc;
 
 	if(NULL == pInstance)
 	{
@@ -124,6 +126,29 @@ void FirstOrderModelRun(void* pInstance, const TIME_EVENT Events)
     {
 	   return;
     }
+
+    Tc = ((double)TimeSourceGetTc(pModel->pTimeCtx))/1000;
+
+    //save previous values
+    pModel->Internal.Prev_y   = pModel->y;
+    pModel->Internal.Prev_Int = pModel->Internal.Integral;
+
+   	//model calculations
+    pModel->u = 0.0; //PidGetCS(pModel->pPidCtx); //nie input from regulator
+   	pModel->Internal.Integral = (pModel->k/pModel->Ts)*pModel->u - (1/pModel->Ts)*pModel->y_delayed;
+   	pModel->y = pModel->Internal.Prev_y + (Tc/2)*(pModel->Internal.Integral + pModel->Internal.Prev_Int);
+
+   	//delay
+   	if(NO_DELAY != pModel->Tdelay)
+   	{
+   	   pModel->y_delayed = shift_delay_array(pModel->Internal.Delay_array,pModel->Internal.Delay_array_size,1);
+   	   *(pModel->Internal.Delay_array) = pModel->y;
+   	}
+   	else
+   	{
+   		pModel->y_delayed = pModel->y;
+   	}
+
 
 }
 
