@@ -7,8 +7,46 @@
 
 #include "common.h"
 #include "regulator_PID.h"
-#include "sim_env.h"
 #include "model_1.h"
+#include "time_source.h"
+#include "time_observer.h"
+
+#include "sim_env.h"
+
+typedef struct _REG_PID
+{
+   //settings
+   BOOL Reg_On;      //Regulator On/Off
+   BOOL P_sel;       //Proportional part is On/Off
+   BOOL I_sel;       //Intergrator part is On/Off
+   BOOL D_sel;       //Differential part in On/Off
+   int  AntiWindup;  //AntiWindup algorithm selection
+   double kp;        //gain [-]
+   double Ti;        //Intergrator time [s]
+   double Td;        //Differential time [s]
+   double Tp;		 //Scanning period [s]
+   double Tt;		 //Tracking time for antiwindup back-calculation algorithm
+   double CS_min;	 //min Control Signal
+   double CS_max;    //max Control Signal
+
+   //runtime
+   double P;		//Proportional value
+   double I;		//Integrator value
+   double D;		//Differential value
+   double CS_raw;	//Raw Control Signal before saturation limit check etc.
+   double CS;	    //Output Control Signal
+
+   double e;           //error
+   double es;          //error for antiwindup back-calculation algorithm
+   double int_e;
+   double int_es;
+   double diff_e;
+   double prev_e;
+   double prev_int_e;
+   double prev_es;
+   double prev_int_es;
+
+}REG_PID;
 
 //Jesli aktualna probka rowna sie maksymalnej ilosci probek to wyznaczamy nowy CS
 #define CalculateNewControlSignal(CurrentSample,MaxSample) (0 == (CurrentSample)%(MaxSample))

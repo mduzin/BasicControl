@@ -17,13 +17,21 @@
 //ADT
 typedef struct _REG_PID* REG_PID_PTR;
 
+typedef enum _ANTI_WINDUP_TYPE
+{
+	NO_ANTI_WINDUP = 0,
+	BACK_CALCULATION,		//Tracking anti-windup, back-calculation
+	INTEGRATOR_CLAMPING            //Integrator clamping
+}ANTI_WINDUP_TYPE;
+
 /** @brief parametry inicjalizujace regulatora */
 typedef struct _INIT_PID_PARAM
 {
-  BOOL Pid_On;
+  BOOL Reg_On;
   BOOL P_sel;
   BOOL I_sel;
   BOOL D_sel;
+  int  AntiWindup;
   BOOL AntiWindupV1_sel;
   BOOL AntiWindupV2_sel;
   double kp;
