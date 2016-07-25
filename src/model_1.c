@@ -108,6 +108,15 @@ STATUS FirstOrderModelInit(FIRST_ORDER_MODEL_PTR* ppModel)
 
 }
 
+
+STATUS FirstOrderModelClose(FIRST_ORDER_MODEL_PTR pModel)
+{
+	free(pModel->Internal.Delay_array);
+	free(pModel);
+	pModel = NULL;
+	return STATUS_SUCCESS;
+}
+
 void FirstOrderModelRun(void* pInstance, const TIME_EVENT Events)
 {
 
@@ -150,15 +159,6 @@ void FirstOrderModelRun(void* pInstance, const TIME_EVENT Events)
    	}
 
 
-}
-
-
-STATUS FirstOrderModelClose(FIRST_ORDER_MODEL_PTR pModel)
-{
-	free(pModel->Internal.Delay_array);
-	free(pModel);
-	pModel = NULL;
-	return STATUS_SUCCESS;
 }
 
 
