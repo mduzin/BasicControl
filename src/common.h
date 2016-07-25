@@ -90,6 +90,12 @@ typedef enum _TIME_EVENT_INDEX
 #define TIME_500MS  (500)
 #define TIME_1000MS (1000)
 
+#define T10_MS	    (0.01)
+#define T20_MS	    (0.02)
+#define T100_MS	    (0.1)
+#define T500_MS	    (0.5)
+#define T1000_MS    (1.0)
+
 typedef unsigned char TIME_EVENT;
 
 #define IDX_TO_MAP(Idx) ((0x1) << (Idx))
