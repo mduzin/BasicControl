@@ -13,6 +13,7 @@
 
 #include "sim_env.h"
 
+
 typedef struct _REG_PID
 {
    //settings
@@ -47,6 +48,8 @@ typedef struct _REG_PID
    double prev_int_es;
 
    BOOL Saturation;
+   int  TpCounter;	//number of 10ms ticks to start regulator
+   int  TpAcc;		//current number of counted ticks
 
    TIME_SOURCE_CTX_PTR    pTimeCtx;
    FIRST_ORDER_MODEL_PTR  pModelCtx;
@@ -98,6 +101,8 @@ STATUS RegPidInit(REG_PID_PTR* ppPid)
 	(*ppPid)->prev_int_e = 0.0;
 	(*ppPid)->prev_es = 0.0;
 	(*ppPid)->prev_int_es = 0.0;
+	(*ppPid)->TpAcc = 0;
+	(*ppPid)->TpCounter = (int)DIV_ROUND_CLOSEST((*ppPid)->Tp, T10_MS);
 
 	//Register events to time observe
 	Events = (TE_BOT |

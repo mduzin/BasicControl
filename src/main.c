@@ -20,6 +20,8 @@
 
 TIME_SOURCE_CTX_PTR   pTimeCtx;
 INPUT_SIGNAL_RECT_PTR pInputRect;
+FIRST_ORDER_MODEL_PTR pModel;
+REG_PID_PTR           pPid;
 
 
 
@@ -27,10 +29,23 @@ int main(int argc, char *argv[])
 {
 	printf("Symulacja obiektu I-ego rzedu\n");
 
+	//First phase init - allocate memory and set variables
 	TimeSourceInit(&pTimeCtx);
 	RectangleSignalInit(&pInputRect);
-	TimeSourceTick(pTimeCtx);
+	FirstOrderModelInit(&pModel);
+	RegPidInit(&pPid);
 
+
+	//Second phase init - share handles, avoid cross dependency
+
+	//run simulation
+	//TimeSourceTick(pTimeCtx);
+
+	//finishing simulation - free memory
+	//FirstOrderModelClose(pModel);
+	//RegPidClose(pPid);
+
+	printf("Zakonczono symulacje.\n");
 	return 0;
 }
 

@@ -68,13 +68,14 @@ STATUS FirstOrderModelInit(FIRST_ORDER_MODEL_PTR* ppModel)
 	}
 
 	//Model parameters
-	(*ppModel)->k      = 1;	  // gain
-	(*ppModel)->Ts     = 4;	  // time const [s]
-	(*ppModel)->Tdelay = 0.5; // model delay [s]
-	(*ppModel)->u      = 1;
-	(*ppModel)->y     = 0;
+	(*ppModel)->k      = 1.0;	  // gain
+	(*ppModel)->Ts     = 4.0;	  // time const [s]
+	(*ppModel)->Tdelay = 0.5;     // model delay [s]
+	(*ppModel)->u      = 1.0;
+	(*ppModel)->y      = 0.0;
 
 	//Allocate memory for model delay array
+	/*<TODO:>cross dependency with time source
     if(NO_DELAY != (*ppModel)->Tdelay)
     {
     	Tdelay_ms =((long)(*ppModel)->Tdelay)* 1000;
@@ -89,7 +90,7 @@ STATUS FirstOrderModelInit(FIRST_ORDER_MODEL_PTR* ppModel)
     	{
     	   init_delay_array((*ppModel)->Internal.Delay_array,(*ppModel)->Internal.Delay_array_size, 0.0);
   	    }
-    }
+    }*/
 
 
     //Internal variables
@@ -122,6 +123,7 @@ void FirstOrderModelRun(void* pInstance, const TIME_EVENT Events)
 
 	FIRST_ORDER_MODEL_PTR pModel = NULL;
 	double  Tc;
+
 
 	if(NULL == pInstance)
 	{
