@@ -17,6 +17,11 @@
 //ADT
 typedef struct _REG_PID* REG_PID_PTR;
 
+//API for ADT
+STATUS RegPidInit(REG_PID_PTR*);
+STATUS RegPidClose(REG_PID_PTR);
+void   RegPidRun(void* pInstance, const TIME_EVENT Events);
+
 typedef enum _ANTI_WINDUP_TYPE
 {
 	NO_ANTI_WINDUP = 0,

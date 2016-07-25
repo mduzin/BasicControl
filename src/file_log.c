@@ -5,6 +5,10 @@
  *      Author: M
  */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "file_log.h"
 
 typedef struct _FILE_LOG

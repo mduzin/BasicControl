@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
  init_values.model.Ts = 4.0;
  init_values.model.Tdelay = 0.5;
 
- init_values.pid.Pid_On = TRUE;
+ init_values.pid.Reg_On = TRUE;
  init_values.pid.P_sel = TRUE;
  init_values.pid.I_sel = TRUE;
  init_values.pid.D_sel = FALSE;
@@ -173,7 +173,7 @@ int main(int argc, char *argv[])
 
  //Pure ma tylko wylaczonego PID'a reszta jest ta sama
  init_pure = init_values;
- init_pure.pid.Pid_On = FALSE;
+ init_pure.pid.Reg_On = FALSE;
 
  init_pure.log.filename = "Model1P.csv";
 
