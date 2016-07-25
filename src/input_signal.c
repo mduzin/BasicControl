@@ -114,7 +114,7 @@ STATUS RectangleSignalInit(IN INPUT_SIGNAL_RECT_PTR* ppInput)
 			  TE_1000MS);
 
 	//call register API
-	CreateObserver((void*)pInput, Events, RectangleSignal);
+	CreateObserver((void*)(*ppInput), Events, RectangleSignal);
 
 	return Status;
 
