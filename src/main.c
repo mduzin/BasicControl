@@ -18,9 +18,9 @@
 #include "input_signal.h"
 #include "time_source.h"
 
-INPUT_SIGNAL_RECT InputRect;
+TIME_SOURCE_CTX_PTR   pTimeCtx;
+INPUT_SIGNAL_RECT_PTR pInputRect;
 
-TIME_SOURCE_CTX_PTR pTimeCtx;
 
 
 int main(int argc, char *argv[])
@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 	printf("Symulacja obiektu I-ego rzedu\n");
 
 	TimeSourceInit(&pTimeCtx);
-	RectangleSignalInit(&InputRect);
+	RectangleSignalInit(&pInputRect);
 	TimeSourceTick(pTimeCtx);
 
 	return 0;

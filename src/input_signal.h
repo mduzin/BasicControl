@@ -17,28 +17,15 @@
 #include "common.h"
 #include "time_observer.h"
 
-//<TODO:> Do przerobienia na ADT
-typedef struct _INPUT_SIGNAL_STEP
-{
-   double Value;				//aktualna wartosc sygnalu
-   double InitValue;			//Wartosc poczatkowa sygnalu
+//ADT
+typedef struct _INPUT_SIGNAL_STEP* INPUT_SIGNAL_STEP_PTR;
+typedef struct _INPUT_SIGNAL_RECT* INPUT_SIGNAL_RECT_PTR;
 
-} INPUT_SIGNAL_STEP;
 
-typedef struct _INPUT_SIGNAL_RECT
-{
-   double Value;				//aktualna wartosc sygnalu
-   double InitValue;			//Wartosc poczatkowa sygnalu
-   int    SwitchTime;			//czas ktory zmieniamy sygnal
-
-   int InternalCounter;			//zmienna wewn.
-
-} INPUT_SIGNAL_RECT;
-
-STATUS StepSignalInit(IN INPUT_SIGNAL_STEP* pInput);
+STATUS StepSignalInit(IN INPUT_SIGNAL_STEP_PTR* ppInput);
 void StepSignal(void* pInstance, const TIME_EVENT Events);
 
-STATUS RectangleSignalInit(IN INPUT_SIGNAL_RECT* pInput);
+STATUS RectangleSignalInit(IN INPUT_SIGNAL_RECT_PTR* ppInput);
 void RectangleSignal(void* pInstance, const TIME_EVENT Events);
 
 
