@@ -48,6 +48,7 @@ STATUS FirstOrderModelInit(FIRST_ORDER_MODEL_PTR* ppModel)
 {
 	TIME_EVENT Events;
 
+
 	if(NULL == ppModel)
 	{
   	   return STATUS_PTR_ERROR;
@@ -80,6 +81,8 @@ STATUS FirstOrderModelInit(FIRST_ORDER_MODEL_PTR* ppModel)
 
     //call register API
     CreateObserver((void*)(*ppModel), Events, FirstOrderModelRun);
+
+
 
 	return STATUS_SUCCESS;
 
@@ -157,7 +160,7 @@ void FirstOrderModelRun(void* pInstance, const TIME_EVENT Events)
     pModel->Prev_Int = pModel->Integral;
 
    	//model calculations
-    pModel->u = 0.0; //PidGetCS(pModel->pPidCtx); //nie input from regulator
+    pModel->u = RegPidGetCS(pModel->pPidCtx);
    	pModel->Integral = (pModel->k/pModel->Ts)*pModel->u - (1/pModel->Ts)*pModel->y_delayed;
    	pModel->y = pModel->Prev_y + (Tc/2)*(pModel->Integral + pModel->Prev_Int);
 
@@ -172,6 +175,17 @@ void FirstOrderModelRun(void* pInstance, const TIME_EVENT Events)
    		pModel->y_delayed = pModel->y;
    	}
 
+   printf("Model output: %f\n",pModel->y_delayed);
+}
+
+double FirstOrderModelGetOutput(FIRST_ORDER_MODEL_PTR pModel)
+{
+   if(NULL == pModel)
+   {
+	   return 0.0;
+   }
+
+   return pModel->y_delayed;
 
 }
 

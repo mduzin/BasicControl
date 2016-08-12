@@ -18,6 +18,12 @@
 #include "input_signal.h"
 #include "model_1.h"
 
+typedef enum _ANTI_WINDUP_TYPE
+{
+	NO_ANTI_WINDUP = 0,
+	BACK_CALCULATION,		//Tracking anti-windup, back-calculation
+	INTEGRATOR_CLAMPING            //Integrator clamping
+}ANTI_WINDUP_TYPE;
 
 
 //API for ADT
@@ -29,12 +35,9 @@ STATUS RegPidPostInit(IO REG_PID_PTR pPid,
 STATUS RegPidClose(REG_PID_PTR);
 void   RegPidRun(void* pInstance, const TIME_EVENT Events);
 
-typedef enum _ANTI_WINDUP_TYPE
-{
-	NO_ANTI_WINDUP = 0,
-	BACK_CALCULATION,		//Tracking anti-windup, back-calculation
-	INTEGRATOR_CLAMPING            //Integrator clamping
-}ANTI_WINDUP_TYPE;
+double RegPidGetCS(REG_PID_PTR);
+
+
 
 
 #endif /* REGULATOR_PI_H_ */

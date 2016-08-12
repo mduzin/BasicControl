@@ -166,7 +166,7 @@ void RectangleSignal(void* pInstance, const TIME_EVENT Events)
 			pInput->InternalCounter = 0;
 		}
 	}
-
+	//printf("Input value: %f\n",pInput->Value);
 }
 
 

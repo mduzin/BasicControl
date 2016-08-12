@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     RegPidPostInit(pPid,pTimeCtx,pInputRect,pModel);
 
 	//run simulation
-	//TimeSourceTick(pTimeCtx);
+	TimeSourceTick(pTimeCtx);
 
 	//finishing simulation - free memory
 	FirstOrderModelClose(pModel);

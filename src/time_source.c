@@ -46,6 +46,7 @@ STATUS attach(IN TIME_OBSERVER_PTR Observer)
   }
 
   gObservers[Index] = Observer;
+  Index++;
   return STATUS_SUCCESS;
 
 }
@@ -93,7 +94,7 @@ STATUS TimeSourceInit(TIME_SOURCE_CTX_PTR* ppTimeCtx)
 }
 
 
-// Time tick and observers notitication
+// Time tick and observers notification
 // Time tick can be implemented as:
 // simple counter
 // posix pselect with timeout
@@ -114,6 +115,7 @@ void TimeSourceTick(TIME_SOURCE_CTX_PTR pTimeCtx)
  //Time tick logic as simple counter
  for(; pTimeCtx->CurrTsym <= pTimeCtx->Tsym ; pTimeCtx->CurrTsym += pTimeCtx->Tc)
  {
+	 //printf("Time tick: %lu \n",pTimeCtx->CurrTsym);
 	 Events = NO_EVENT;
 	 EventsFiltered = NO_EVENT;
 

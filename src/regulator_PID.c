@@ -171,7 +171,7 @@ void   RegPidRun(void* pInstance, const TIME_EVENT Events)
     pPid->prev_int_es = pPid->int_es;
 
     //error value
-    pPid->e =  RectangleSignalGetValue(pPid->pInputCtx); //simulation->Runtime.akt_SP - model->Runtime.y;
+    pPid->e =  RectangleSignalGetValue(pPid->pInputCtx) - FirstOrderModelGetOutput(pPid->pModelCtx);
     pPid->es = pPid->CS - pPid->CS_raw;
 
 
@@ -236,5 +236,16 @@ void   RegPidRun(void* pInstance, const TIME_EVENT Events)
 		pPid->Saturation = FALSE;
 	}
 
+
+}
+
+double RegPidGetCS(IN REG_PID_PTR pPid)
+{
+   if(NULL == pPid)
+   {
+	   return 0.0;
+   }
+
+   return pPid->CS;
 
 }

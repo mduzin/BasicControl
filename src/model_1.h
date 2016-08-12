@@ -26,6 +26,8 @@ STATUS FirstOrderModelPostInit(IO FIRST_ORDER_MODEL_PTR pModel,
 STATUS FirstOrderModelClose(FIRST_ORDER_MODEL_PTR);
 void FirstOrderModelRun(void* pInstance, const TIME_EVENT Events);
 
+double FirstOrderModelGetOutput(FIRST_ORDER_MODEL_PTR);
+
 
 
 #endif /* MODEL_1_H_ */
