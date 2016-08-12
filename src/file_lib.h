@@ -27,6 +27,7 @@ typedef struct _LOG_PARAM
 	FILE *file;
 }LOG_PARAM;
 
+/*
 //Inicjalizacja pliku z logowaniem danych
 STATUS log_init(IN INIT_LOG_PARAM init_param,
 		        IO LOG_PARAM *log);
@@ -37,5 +38,5 @@ STATUS log_write(IO LOG_PARAM *log,
 				 IN MODEL_PARAM *model);
 //zamykanie pliku z logiem
 STATUS log_close(IN LOG_PARAM *log);
-
+*/
 #endif /* LIB_FILE_H_ */

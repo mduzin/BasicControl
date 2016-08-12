@@ -85,6 +85,16 @@ void StepSignal(void* pInstance, const TIME_EVENT Events)
 
 }
 
+double StepSignalGetValue(IN INPUT_SIGNAL_STEP_PTR pInput)
+{
+  if(NULL != pInput )
+  {
+	  return pInput->Value;
+  }
+  return 0.0;
+
+}
+
 //tworzenie obiektu Input Signal
 STATUS RectangleSignalInit(IN INPUT_SIGNAL_RECT_PTR* ppInput)
 {
@@ -159,4 +169,14 @@ void RectangleSignal(void* pInstance, const TIME_EVENT Events)
 
 }
 
+
+double RectangleSignalGetValue(IN INPUT_SIGNAL_RECT_PTR pInput)
+{
+  if(NULL != pInput )
+  {
+	  return pInput->Value;
+  }
+  return 0.0;
+
+}
 

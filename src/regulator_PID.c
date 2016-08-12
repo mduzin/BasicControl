@@ -52,6 +52,7 @@ typedef struct _REG_PID
    int  TpAcc;		//current number of counted ticks
 
    TIME_SOURCE_CTX_PTR    pTimeCtx;
+   INPUT_SIGNAL_RECT_PTR  pInputCtx;
    FIRST_ORDER_MODEL_PTR  pModelCtx;
 
 }REG_PID;
@@ -116,6 +117,25 @@ STATUS RegPidInit(REG_PID_PTR* ppPid)
 
 }
 
+STATUS RegPidPostInit(IO REG_PID_PTR pPid,
+		              IN TIME_SOURCE_CTX_PTR pTimeCtx,
+					  IN INPUT_SIGNAL_RECT_PTR pInputRect,
+					  IN FIRST_ORDER_MODEL_PTR pModel)
+{
+	if((NULL == pPid)||(NULL == pTimeCtx)||(NULL == pInputRect)||(NULL == pModel))
+	{
+	  return STATUS_PTR_ERROR;
+	}
+
+	pPid->pTimeCtx  = pTimeCtx;
+	pPid->pInputCtx = pInputRect;
+	pPid->pModelCtx = pModel;
+
+
+	return STATUS_SUCCESS;
+
+}
+
 STATUS RegPidClose(REG_PID_PTR pPid)
 {
 	free(pPid);
@@ -135,15 +155,11 @@ void   RegPidRun(void* pInstance, const TIME_EVENT Events)
 	pPid = (REG_PID*)pInstance;
 
 
-    if((NULL == pPid->pTimeCtx) || (NULL == pPid->pModelCtx))
-    {
-	   return;
-    }
 
     //regulator Off forward SP to CS
     if(FALSE == pPid->Reg_On)
    	{
-   	   pPid->CS_raw = 1.0; // get SP from input signal
+   	   pPid->CS_raw = RectangleSignalGetValue(pPid->pInputCtx);
    	   return;
    	}
 
@@ -155,7 +171,7 @@ void   RegPidRun(void* pInstance, const TIME_EVENT Events)
     pPid->prev_int_es = pPid->int_es;
 
     //error value
-    pPid->e =  0.0; //simulation->Runtime.akt_SP - model->Runtime.y;
+    pPid->e =  RectangleSignalGetValue(pPid->pInputCtx); //simulation->Runtime.akt_SP - model->Runtime.y;
     pPid->es = pPid->CS - pPid->CS_raw;
 
 

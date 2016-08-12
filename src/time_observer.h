@@ -9,12 +9,11 @@
 #define TIME_OBSERVER_H_
 
 #include "common.h"
+#include "adt.h"
 
 //Typ wskaznika na funkcje callback wywolana, gdy wydarzy sie jakis time event okreslony w event_id
 typedef void (*TIME_EVENT_NOTIFICATION)(void* pInstance, const TIME_EVENT Event_id);
 
-//ADT dla typu obserwator czasu
-typedef struct _TIME_OBSERVER* TIME_OBSERVER_PTR;
 
 //deklaracje funkcji dla ADT obserwatora czasu
 STATUS CreateObserver(IN void* pInstance,

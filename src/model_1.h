@@ -13,13 +13,16 @@
 #include <string.h>
 
 #include "common.h"
-#include "sim_env.h"
+#include "adt.h"
+#include "time_source.h"
+#include "regulator_PID.h"
 
-//ADT
-typedef struct _FIRST_ORDER_MODEL* FIRST_ORDER_MODEL_PTR;
 
 //API for ADT
 STATUS FirstOrderModelInit(FIRST_ORDER_MODEL_PTR*);
+STATUS FirstOrderModelPostInit(IO FIRST_ORDER_MODEL_PTR pModel,
+							   IN REG_PID_PTR pPid,
+							   IN TIME_SOURCE_CTX_PTR pTimeCtx);
 STATUS FirstOrderModelClose(FIRST_ORDER_MODEL_PTR);
 void FirstOrderModelRun(void* pInstance, const TIME_EVENT Events);
 

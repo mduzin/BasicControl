@@ -15,18 +15,17 @@
 #include <math.h>
 
 #include "common.h"
+#include "adt.h"
 #include "time_observer.h"
-
-//ADT
-typedef struct _INPUT_SIGNAL_STEP* INPUT_SIGNAL_STEP_PTR;
-typedef struct _INPUT_SIGNAL_RECT* INPUT_SIGNAL_RECT_PTR;
 
 
 STATUS StepSignalInit(IN INPUT_SIGNAL_STEP_PTR* ppInput);
-void StepSignal(void* pInstance, const TIME_EVENT Events);
+void   StepSignal(void* pInstance, const TIME_EVENT Events);
+double StepSignalGetValue(IN INPUT_SIGNAL_STEP_PTR pInput);
 
 STATUS RectangleSignalInit(IN INPUT_SIGNAL_RECT_PTR* ppInput);
-void RectangleSignal(void* pInstance, const TIME_EVENT Events);
+void   RectangleSignal(void* pInstance, const TIME_EVENT Events);
+double RectangleSignalGetValue(IN INPUT_SIGNAL_RECT_PTR pInput);
 
 
 #endif /* INPUT_SIGNAL_H_ */

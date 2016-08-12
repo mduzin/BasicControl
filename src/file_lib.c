@@ -46,7 +46,7 @@ STATUS log_init(IN INIT_LOG_PARAM init_param,
    return STATUS_FAILURE;
 }
 
-
+/*
 STATUS log_write(IO LOG_PARAM *log,
 		         IN SIMULATION_PARAM *simulation,
 				 IN PID_PARAM *regulator,
@@ -101,3 +101,4 @@ STATUS log_close(LOG_PARAM *log)
 		return STATUS_FAILURE;
 	}
 }
+*/

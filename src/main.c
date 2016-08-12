@@ -13,6 +13,7 @@
 #include <math.h>
 
 #include "common.h"
+#include "adt.h"
 #include "regulator_PID.h"
 #include "model_1.h"
 #include "input_signal.h"
@@ -37,12 +38,14 @@ int main(int argc, char *argv[])
 
 
 	//Second phase init - share handles, avoid cross dependency
+    FirstOrderModelPostInit(pModel,pPid,pTimeCtx);
+    RegPidPostInit(pPid,pTimeCtx,pInputRect,pModel);
 
 	//run simulation
 	//TimeSourceTick(pTimeCtx);
 
 	//finishing simulation - free memory
-	//FirstOrderModelClose(pModel);
+	FirstOrderModelClose(pModel);
 	//RegPidClose(pPid);
 
 	printf("Zakonczono symulacje.\n");

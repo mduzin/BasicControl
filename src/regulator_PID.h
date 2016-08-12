@@ -13,12 +13,19 @@
 #include <string.h>
 
 #include "common.h"
+#include "adt.h"
+#include "time_source.h"
+#include "input_signal.h"
+#include "model_1.h"
 
-//ADT
-typedef struct _REG_PID* REG_PID_PTR;
+
 
 //API for ADT
 STATUS RegPidInit(REG_PID_PTR*);
+STATUS RegPidPostInit(IO REG_PID_PTR pPid,
+		              IN TIME_SOURCE_CTX_PTR pTimeCtx,
+					  IN INPUT_SIGNAL_RECT_PTR pInputRect,
+					  IN FIRST_ORDER_MODEL_PTR pModel);
 STATUS RegPidClose(REG_PID_PTR);
 void   RegPidRun(void* pInstance, const TIME_EVENT Events);
 

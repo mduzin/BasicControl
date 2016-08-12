@@ -9,10 +9,9 @@
 #define TIME_SOURCE_H_
 
 #include "common.h"
+#include "adt.h"
 #include "time_observer.h"
 
-//ADT for time source contetx
-typedef struct _TIME_SOURCE_CTX* TIME_SOURCE_CTX_PTR;
 
 //API for ADT
 STATUS TimeSourceInit(TIME_SOURCE_CTX_PTR*);

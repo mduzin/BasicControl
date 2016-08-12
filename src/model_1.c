@@ -14,21 +14,6 @@
 
 #define NO_DELAY 0.0
 
-typedef struct _FIRST_ORDER_INTERNAL_VARIABLES
-{
-
-  double Integral;	        //zmienna wewnetrzna obiektu na ktorej obliczany ca³kowanie
-
-  /*Zmienne z poprzedniej iteracji symulacji obiektu*/
-  double Prev_y;			//sygnal wyjsciowy
-  double Buff_y;
-  double Prev_Int;	        //zmienna wewnetrzna obiektu na ktorej obliczany ca³kowanie w obiekcie
-
-  double* Delay_array;		//wskaznik na tablice z opoznionymi probkami
-  int     Delay_array_size;	//rozmiar tablicy z opoznionymi probkami
-
-
-} FIRST_ORDER_INTERNAL_VARIABLES;
 
 typedef struct _FIRST_ORDER_MODEL
 {
@@ -40,7 +25,16 @@ typedef struct _FIRST_ORDER_MODEL
    double y;	      //output value
    double y_delayed;  //output value for model with delay
 
-   FIRST_ORDER_INTERNAL_VARIABLES Internal;
+   double Integral;	        //zmienna wewnetrzna obiektu na ktorej obliczany ca³kowanie
+
+   /*Zmienne z poprzedniej iteracji symulacji obiektu*/
+   double Prev_y;			//sygnal wyjsciowy
+   double Buff_y;
+   double Prev_Int;	        //zmienna wewnetrzna obiektu na ktorej obliczany ca³kowanie w obiekcie
+
+   double* Delay_array;		//wskaznik na tablice z opoznionymi probkami
+   int     Delay_array_size;	//rozmiar tablicy z opoznionymi probkami
+
    TIME_SOURCE_CTX_PTR pTimeCtx;
    REG_PID_PTR         pPidCtx;
 
@@ -53,7 +47,6 @@ static void print_delay_array(double *array_ptr,int array_size);
 STATUS FirstOrderModelInit(FIRST_ORDER_MODEL_PTR* ppModel)
 {
 	TIME_EVENT Events;
-	long Tdelay_ms = 0;
 
 	if(NULL == ppModel)
 	{
@@ -74,29 +67,12 @@ STATUS FirstOrderModelInit(FIRST_ORDER_MODEL_PTR* ppModel)
 	(*ppModel)->u      = 1.0;
 	(*ppModel)->y      = 0.0;
 
-	//Allocate memory for model delay array
-	/*<TODO:>cross dependency with time source
-    if(NO_DELAY != (*ppModel)->Tdelay)
-    {
-    	Tdelay_ms =((long)(*ppModel)->Tdelay)* 1000;
-
-    	(*ppModel)->Internal.Delay_array_size = (int)DIV_ROUND_CLOSEST(Tdelay_ms, TimeSourceGetTc((*ppModel)->pTimeCtx));
-    	(*ppModel)->Internal.Delay_array = (double*)malloc((*ppModel)->Internal.Delay_array_size * sizeof(double));
-    	if(NULL == (*ppModel)->Internal.Delay_array)
-    	{
-    	   return STATUS_PTR_ERROR;
-    	}
-    	else
-    	{
-    	   init_delay_array((*ppModel)->Internal.Delay_array,(*ppModel)->Internal.Delay_array_size, 0.0);
-  	    }
-    }*/
 
 
     //Internal variables
-    (*ppModel)->Internal.Prev_y   = 0.0;
-    (*ppModel)->Internal.Integral = 0.0;
-    (*ppModel)->Internal.Prev_Int = 0.0;
+    (*ppModel)->Prev_y   = 0.0;
+    (*ppModel)->Integral = 0.0;
+    (*ppModel)->Prev_Int = 0.0;
 
     //Register events to time observe
    	Events = (TE_BOT |
@@ -109,10 +85,46 @@ STATUS FirstOrderModelInit(FIRST_ORDER_MODEL_PTR* ppModel)
 
 }
 
+STATUS FirstOrderModelPostInit(IO FIRST_ORDER_MODEL_PTR pModel,
+							   IN REG_PID_PTR pPid,
+							   IN TIME_SOURCE_CTX_PTR pTimeCtx)
+{
+	long Tdelay_ms = 0;
+
+    if((NULL == pModel)||(NULL == pPid)||(NULL == pTimeCtx))
+    {
+    	return STATUS_PTR_ERROR;
+    }
+
+    //save handles to necessary ADT
+    pModel->pPidCtx = pPid;
+	pModel->pTimeCtx = pTimeCtx;
+
+    //Allocate memory for model delay array
+    if(NO_DELAY != (pModel)->Tdelay)
+    {
+        Tdelay_ms =(long)((pModel)->Tdelay* 1000.0);
+
+        (pModel)->Delay_array_size = (int)DIV_ROUND_CLOSEST(Tdelay_ms, TimeSourceGetTc(pTimeCtx));
+       	(pModel)->Delay_array = (double*)malloc((pModel)->Delay_array_size * sizeof(double));
+        if(NULL == (pModel)->Delay_array)
+       	{
+       	   return STATUS_PTR_ERROR;
+       	}
+       	else
+       	{
+       	   init_delay_array((pModel)->Delay_array,(pModel)->Delay_array_size, 0.0);
+   	    }
+     }
+
+     return STATUS_SUCCESS;
+
+}
+
 
 STATUS FirstOrderModelClose(FIRST_ORDER_MODEL_PTR pModel)
 {
-	free(pModel->Internal.Delay_array);
+	free(pModel->Delay_array);
 	free(pModel);
 	pModel = NULL;
 	return STATUS_SUCCESS;
@@ -141,19 +153,19 @@ void FirstOrderModelRun(void* pInstance, const TIME_EVENT Events)
     Tc = ((double)TimeSourceGetTc(pModel->pTimeCtx))/1000;
 
     //save previous values
-    pModel->Internal.Prev_y   = pModel->y;
-    pModel->Internal.Prev_Int = pModel->Internal.Integral;
+    pModel->Prev_y   = pModel->y;
+    pModel->Prev_Int = pModel->Integral;
 
    	//model calculations
     pModel->u = 0.0; //PidGetCS(pModel->pPidCtx); //nie input from regulator
-   	pModel->Internal.Integral = (pModel->k/pModel->Ts)*pModel->u - (1/pModel->Ts)*pModel->y_delayed;
-   	pModel->y = pModel->Internal.Prev_y + (Tc/2)*(pModel->Internal.Integral + pModel->Internal.Prev_Int);
+   	pModel->Integral = (pModel->k/pModel->Ts)*pModel->u - (1/pModel->Ts)*pModel->y_delayed;
+   	pModel->y = pModel->Prev_y + (Tc/2)*(pModel->Integral + pModel->Prev_Int);
 
    	//delay
    	if(NO_DELAY != pModel->Tdelay)
    	{
-   	   pModel->y_delayed = shift_delay_array(pModel->Internal.Delay_array,pModel->Internal.Delay_array_size,1);
-   	   *(pModel->Internal.Delay_array) = pModel->y;
+   	   pModel->y_delayed = shift_delay_array(pModel->Delay_array,pModel->Delay_array_size,1);
+   	   *(pModel->Delay_array) = pModel->y;
    	}
    	else
    	{
