@@ -22,7 +22,7 @@ typedef enum _ANTI_WINDUP_TYPE
 {
 	NO_ANTI_WINDUP = 0,
 	BACK_CALCULATION,		//Tracking anti-windup, back-calculation
-	INTEGRATOR_CLAMPING            //Integrator clamping
+	INTEGRATOR_CLAMPING     //Integrator clamping
 }ANTI_WINDUP_TYPE;
 
 
