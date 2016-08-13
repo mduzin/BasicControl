@@ -15,6 +15,15 @@
 
 #define OBSERVERS_NUM 3
 
+typedef enum _OBSERVER_TYPE
+{
+	INPUT_SIGNAL_OBSERVER = 0,
+	MODEL_OBSERVER,
+	PID_OBSERVER,
+	FILE_LOG_OBSERVER,
+	OBSERVER_TYPE_LAST
+}OBSERVER_TYPE;
+
 
 typedef struct _TIME_SOURCE_CTX
 {
@@ -28,7 +37,7 @@ typedef struct _TIME_SOURCE_CTX
 
 //GLOBAL VARIABLES
 TIME_SOURCE_CTX          gTimeCtx;
-static TIME_OBSERVER_PTR gObservers[OBSERVERS_NUM];		//Array of pointers to observers
+static TIME_OBSERVER_PTR gObservers[OBSERVER_TYPE_LAST];		//Array of pointers to observers
 static int Index = 0;
 
 
@@ -40,7 +49,7 @@ STATUS attach(IN TIME_OBSERVER_PTR Observer)
 	  return STATUS_PTR_ERROR;
   }
 
-  if(OBSERVERS_NUM <= Index)
+  if(OBSERVER_TYPE_LAST <= Index)
   {
 	  return STATUS_FAILURE;
   }
@@ -60,7 +69,7 @@ STATUS dettach(IN TIME_OBSERVER_PTR Observer)
 	  return STATUS_PTR_ERROR;
   }
 
-  for(ii = 0 ; OBSERVERS_NUM > ii ; ii++)
+  for(ii = 0 ; OBSERVER_TYPE_LAST > ii ; ii++)
   {
 	  if(gObservers[ii] == Observer)
 	  {
@@ -158,7 +167,7 @@ void TimeSourceTick(TIME_SOURCE_CTX_PTR pTimeCtx)
 
 
 	 //Invoke callbacks for registered observers
-	 for(index = 0; index < OBSERVERS_NUM; index++)
+	 for(index = 0; index < OBSERVER_TYPE_LAST; index++)
      {
 	    if(NULL != gObservers[index])
 	    {
