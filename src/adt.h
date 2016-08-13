@@ -19,5 +19,6 @@ typedef struct _FIRST_ORDER_MODEL* FIRST_ORDER_MODEL_PTR;
 
 typedef struct _REG_PID* REG_PID_PTR;
 
+typedef struct _FILE_LOG* FILE_LOG_PTR;
 
 #endif /* ADT_H_ */
