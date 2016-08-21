@@ -37,6 +37,8 @@ void   RegPidRun(void* pInstance, const TIME_EVENT Events);
 
 double RegPidGetCS(REG_PID_PTR);
 
+char* RegPidGetHeader(IN REG_PID_PTR);
+
 
 
 

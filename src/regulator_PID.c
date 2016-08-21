@@ -249,3 +249,16 @@ double RegPidGetCS(IN REG_PID_PTR pPid)
    return pPid->CS;
 
 }
+
+char* RegPidGetHeader(IN REG_PID_PTR pPid)
+{
+   if(NULL != pPid)
+   {
+      return "P[-], I[-], D[-], CS_raw[-], CS[-], Error[-]";
+   }
+   else
+   {
+	   return "!!!Error!!!";
+   }
+
+}

@@ -28,6 +28,6 @@ void FirstOrderModelRun(void* pInstance, const TIME_EVENT Events);
 
 double FirstOrderModelGetOutput(FIRST_ORDER_MODEL_PTR);
 
-
+char* FirstOrderModelGetHeader(IN FIRST_ORDER_MODEL_PTR);
 
 #endif /* MODEL_1_H_ */

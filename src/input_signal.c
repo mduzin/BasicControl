@@ -180,3 +180,15 @@ double RectangleSignalGetValue(IN INPUT_SIGNAL_RECT_PTR pInput)
 
 }
 
+char*  RectangleSignalGetHeader(IN INPUT_SIGNAL_RECT_PTR pInput)
+{
+   if(NULL != pInput)
+   {
+      return "Input[-]";
+   }
+   else
+   {
+	   return "!!!Error!!!";
+   }
+}
+

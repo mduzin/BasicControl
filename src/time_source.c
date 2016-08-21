@@ -27,10 +27,10 @@ typedef enum _OBSERVER_TYPE
 
 typedef struct _TIME_SOURCE_CTX
 {
-  long Tsym;	  //Simulation time
-  long Tc;	      //Simulation time step !!!MOST IMPORTANT PARAMETER!!!
+  long Tsym;	  //Simulation time [ms]
+  long Tc;	      //Simulation time step [ms] !!!MOST IMPORTANT PARAMETER!!!
 
-  long CurrTsym; //Current Simulation time
+  long CurrTsym; //Current Simulation time [ms]
 
 } TIME_SOURCE_CTX;
 
@@ -208,4 +208,16 @@ long TimeSourceGetCurrTsym(TIME_SOURCE_CTX_PTR pTimeCtx)
   {
 	 return 0;
   }
+}
+
+char*  TimeSourceGetHeader(TIME_SOURCE_CTX_PTR pTimeCtx)
+{
+   if(NULL != pTimeCtx)
+   {
+      return "Time[ms]";
+   }
+   else
+   {
+	   return "!!!Error!!!";
+   }
 }

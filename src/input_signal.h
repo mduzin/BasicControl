@@ -26,6 +26,7 @@ double StepSignalGetValue(IN INPUT_SIGNAL_STEP_PTR pInput);
 STATUS RectangleSignalInit(IN INPUT_SIGNAL_RECT_PTR* ppInput);
 void   RectangleSignal(void* pInstance, const TIME_EVENT Events);
 double RectangleSignalGetValue(IN INPUT_SIGNAL_RECT_PTR pInput);
+char*  RectangleSignalGetHeader(IN INPUT_SIGNAL_RECT_PTR pInput);
 
 
 #endif /* INPUT_SIGNAL_H_ */

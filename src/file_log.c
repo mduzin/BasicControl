@@ -72,6 +72,8 @@ STATUS FileLogPostInit(IO FILE_LOG_PTR pFile,
 					   IN REG_PID_PTR pPid)
 {
 
+	char LogHeader[MAX_STR_LEN];
+
 	if(NULL == pFile)
 	{
    	   return STATUS_PTR_ERROR;
@@ -93,7 +95,24 @@ STATUS FileLogPostInit(IO FILE_LOG_PTR pFile,
 	pFile->pModelCtx = pModel;
 	pFile->pPidCtx   = pPid;
 
-	//<TODO:>fetch header info from handles
+
+	printf("Otworto plik z logiem: %s.\n",pFile->filename);
+
+
+
+	strcat(LogHeader,TimeSourceGetHeader(pTimeCtx));
+	strcat(LogHeader,", ");
+	strcat(LogHeader,RectangleSignalGetHeader(pInputRect));
+	strcat(LogHeader,", ");
+	strcat(LogHeader,RegPidGetHeader(pPid));
+	strcat(LogHeader,", ");
+	strcat(LogHeader,FirstOrderModelGetHeader(pModel));
+	//in case of to long string
+	LogHeader[MAX_STR_LEN-1]= '\0';
+
+	fputs(LogHeader, pFile->file);
+
+	printf("Header: %s\n",LogHeader);
 
 	return STATUS_SUCCESS;
 

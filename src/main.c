@@ -18,11 +18,13 @@
 #include "model_1.h"
 #include "input_signal.h"
 #include "time_source.h"
+#include "file_log.h"
 
 TIME_SOURCE_CTX_PTR   pTimeCtx;
 INPUT_SIGNAL_RECT_PTR pInputRect;
 FIRST_ORDER_MODEL_PTR pModel;
 REG_PID_PTR           pPid;
+FILE_LOG_PTR          pLogFile;
 
 
 
@@ -35,11 +37,13 @@ int main(int argc, char *argv[])
 	RectangleSignalInit(&pInputRect);
 	FirstOrderModelInit(&pModel);
 	RegPidInit(&pPid);
+	FileLogInit(&pLogFile);
 
 
 	//Second phase init - share handles, avoid cross dependency
     FirstOrderModelPostInit(pModel,pPid,pTimeCtx);
     RegPidPostInit(pPid,pTimeCtx,pInputRect,pModel);
+    FileLogPostInit(pLogFile,pTimeCtx,pInputRect,pModel,pPid);
 
 	//run simulation
 	TimeSourceTick(pTimeCtx);
