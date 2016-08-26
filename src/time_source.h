@@ -18,7 +18,9 @@ STATUS TimeSourceInit(TIME_SOURCE_CTX_PTR*);
 void   TimeSourceTick(TIME_SOURCE_CTX_PTR);
 long   TimeSourceGetTc(TIME_SOURCE_CTX_PTR);
 long   TimeSourceGetCurrTsym(TIME_SOURCE_CTX_PTR);
+
 char*  TimeSourceGetHeader(TIME_SOURCE_CTX_PTR);
+STATUS TimeSourceGetLogValues(IN TIME_SOURCE_CTX_PTR, OUT long*);
 
 
 //Add new observer

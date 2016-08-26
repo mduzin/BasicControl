@@ -262,3 +262,19 @@ char* RegPidGetHeader(IN REG_PID_PTR pPid)
    }
 
 }
+
+STATUS RegPidGetValues(IN REG_PID_PTR pPid, OUT REG_PID_LOG_VALUES* pValues)
+{
+	if((NULL == pPid)||(NULL == pValues))
+	{
+		return STATUS_PTR_ERROR;
+	}
+
+	pValues->P         = pPid->P;
+	pValues->I         = pPid->I;
+	pValues->D         = pPid->D;
+	pValues->CS        = pPid->CS;
+	pValues->CS_raw    = pPid->CS_raw;
+	pValues->e         = pPid->e;
+	return STATUS_SUCCESS;
+}

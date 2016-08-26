@@ -221,3 +221,15 @@ char*  TimeSourceGetHeader(TIME_SOURCE_CTX_PTR pTimeCtx)
 	   return "!!!Error!!!";
    }
 }
+
+STATUS TimeSourceGetLogValues(IN TIME_SOURCE_CTX_PTR pTimeCtx, OUT long* pValues)
+{
+	if((NULL == pTimeCtx)||(NULL == pValues))
+	{
+		return STATUS_PTR_ERROR;
+	}
+
+	*pValues = pTimeCtx->CurrTsym;
+	return STATUS_SUCCESS;
+
+}

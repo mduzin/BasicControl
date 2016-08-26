@@ -107,12 +107,12 @@ STATUS FileLogPostInit(IO FILE_LOG_PTR pFile,
 	strcat(LogHeader,RegPidGetHeader(pPid));
 	strcat(LogHeader,", ");
 	strcat(LogHeader,FirstOrderModelGetHeader(pModel));
-	//in case of to long string
+	//in case of too long string
 	LogHeader[MAX_STR_LEN-1]= '\0';
 
 	fputs(LogHeader, pFile->file);
 
-	printf("Header: %s\n",LogHeader);
+	//printf("Header: %s\n",LogHeader);
 
 	return STATUS_SUCCESS;
 

@@ -203,6 +203,19 @@ char* FirstOrderModelGetHeader(IN FIRST_ORDER_MODEL_PTR pModel)
 
 }
 
+STATUS FirstOrderModelGetValues(IN FIRST_ORDER_MODEL_PTR pModel, OUT FIRST_ORDER_MODEL_LOG_VALUES* pValues)
+{
+	if((NULL == pModel)||(NULL == pValues))
+	{
+		return STATUS_PTR_ERROR;
+	}
+
+	pValues->u         = pModel->u;
+	pValues->y         = pModel->y;
+	pValues->y_delayed = pModel->y_delayed;
+	return STATUS_SUCCESS;
+}
+
 
 static void init_delay_array(double *array_ptr,int array_size, double init_val)
 {

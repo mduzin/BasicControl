@@ -192,3 +192,14 @@ char*  RectangleSignalGetHeader(IN INPUT_SIGNAL_RECT_PTR pInput)
    }
 }
 
+STATUS RectangleSignalGetValues(IN INPUT_SIGNAL_RECT_PTR pInput, OUT double* pValues)
+{
+	if((NULL == pInput)||(NULL == pValues))
+	{
+		return STATUS_PTR_ERROR;
+	}
+
+	*pValues = pInput->Value;
+	return STATUS_SUCCESS;
+}
+
