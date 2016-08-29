@@ -12,6 +12,7 @@
 #include "adt.h"
 #include "time_observer.h"
 
+typedef long TIME_SOURCE_LOG_VALUES;
 
 //API for ADT
 STATUS TimeSourceInit(TIME_SOURCE_CTX_PTR*);
@@ -20,7 +21,7 @@ long   TimeSourceGetTc(TIME_SOURCE_CTX_PTR);
 long   TimeSourceGetCurrTsym(TIME_SOURCE_CTX_PTR);
 
 char*  TimeSourceGetHeader(TIME_SOURCE_CTX_PTR);
-STATUS TimeSourceGetLogValues(IN TIME_SOURCE_CTX_PTR, OUT long*);
+STATUS TimeSourceGetLogValues(IN TIME_SOURCE_CTX_PTR, OUT TIME_SOURCE_LOG_VALUES*);
 
 
 //Add new observer

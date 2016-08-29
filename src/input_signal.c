@@ -184,7 +184,7 @@ char*  RectangleSignalGetHeader(IN INPUT_SIGNAL_RECT_PTR pInput)
 {
    if(NULL != pInput)
    {
-      return "Input[-]";
+      return "SP[-]";
    }
    else
    {
@@ -192,7 +192,7 @@ char*  RectangleSignalGetHeader(IN INPUT_SIGNAL_RECT_PTR pInput)
    }
 }
 
-STATUS RectangleSignalGetValues(IN INPUT_SIGNAL_RECT_PTR pInput, OUT double* pValues)
+STATUS RectangleSignalGetValues(IN INPUT_SIGNAL_RECT_PTR pInput, OUT INPUT_SIGNAL_RECT_LOG_VALUES* pValues)
 {
 	if((NULL == pInput)||(NULL == pValues))
 	{

@@ -254,7 +254,7 @@ char* RegPidGetHeader(IN REG_PID_PTR pPid)
 {
    if(NULL != pPid)
    {
-      return "P[-], I[-], D[-], CS_raw[-], CS[-], Error[-]";
+      return "CS[-], CS_raw[-], P[-], I[-], D[-], Error[-]";
    }
    else
    {

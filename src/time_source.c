@@ -222,7 +222,7 @@ char*  TimeSourceGetHeader(TIME_SOURCE_CTX_PTR pTimeCtx)
    }
 }
 
-STATUS TimeSourceGetLogValues(IN TIME_SOURCE_CTX_PTR pTimeCtx, OUT long* pValues)
+STATUS TimeSourceGetLogValues(IN TIME_SOURCE_CTX_PTR pTimeCtx, OUT TIME_SOURCE_LOG_VALUES* pValues)
 {
 	if((NULL == pTimeCtx)||(NULL == pValues))
 	{

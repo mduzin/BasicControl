@@ -32,7 +32,7 @@ STATUS FileLogPostInit(IO FILE_LOG_PTR pFile,
 					   IN FIRST_ORDER_MODEL_PTR pModel,
 					   IN REG_PID_PTR pPid);
 
-STATUS FileLogClose(FIRST_ORDER_MODEL_PTR);
+STATUS FileLogClose(FILE_LOG_PTR);
 void   FileLogWrite(void* pInstance, const TIME_EVENT Events);
 
 

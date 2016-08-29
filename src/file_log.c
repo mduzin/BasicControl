@@ -28,6 +28,14 @@ typedef struct _FILE_LOG
 
 }FILE_LOG;
 
+typedef struct _LOG_LINE
+{
+	TIME_SOURCE_LOG_VALUES       CurrTime;
+	INPUT_SIGNAL_RECT_LOG_VALUES InputSignal;
+	REG_PID_LOG_VALUES           Pid;
+	FIRST_ORDER_MODEL_LOG_VALUES Model;
+
+}LOG_LINE;
 
 STATUS FileLogInit(FILE_LOG_PTR* ppFile)
 {
@@ -104,9 +112,10 @@ STATUS FileLogPostInit(IO FILE_LOG_PTR pFile,
 	strcat(LogHeader,", ");
 	strcat(LogHeader,RectangleSignalGetHeader(pInputRect));
 	strcat(LogHeader,", ");
-	strcat(LogHeader,RegPidGetHeader(pPid));
-	strcat(LogHeader,", ");
 	strcat(LogHeader,FirstOrderModelGetHeader(pModel));
+	strcat(LogHeader,", ");
+	strcat(LogHeader,RegPidGetHeader(pPid));
+	strcat(LogHeader,"\n");
 	//in case of too long string
 	LogHeader[MAX_STR_LEN-1]= '\0';
 
@@ -119,11 +128,63 @@ STATUS FileLogPostInit(IO FILE_LOG_PTR pFile,
 
 }
 
-STATUS FileLogClose(FIRST_ORDER_MODEL_PTR pFile)
+STATUS FileLogClose(FILE_LOG_PTR pFile)
 {
-	return STATUS_SUCCESS;
+	if(NULL == pFile)
+	{
+		return STATUS_PTR_ERROR;
+	}
+
+    if(OK == fclose(pFile->file))
+	{
+		printf("Zamknieto plik loga: %s.\n", pFile->filename);
+		return STATUS_SUCCESS;
+	}
+	else
+	{
+		printf("Nie udalo sie zamknac pliku log.\n");
+		return STATUS_FAILURE;
+	}
+
+
 }
+
 void   FileLogWrite(void* pInstance, const TIME_EVENT Events)
 {
+	LOG_LINE LogLine;
+	char buff[MAX_STR_LEN];
+	FILE_LOG* pFile = NULL;
+
+	if(NULL == pInstance)
+	{
+		return;
+	}
+
+	pFile = (FILE_LOG*)pInstance;
+
+	//Gather logged values
+	//<TODO:> check status codes
+	TimeSourceGetLogValues(pFile->pTimeCtx, &LogLine.CurrTime);
+	RectangleSignalGetValues(pFile->pInputCtx, &LogLine.InputSignal);
+	FirstOrderModelGetValues(pFile->pModelCtx, &LogLine.Model);
+	RegPidGetValues(pFile->pPidCtx, &LogLine.Pid);
+
+	//prepare log line
+	//save log line
+	sprintf(buff, "%lu,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\n",
+					 ((long)LogLine.CurrTime),
+					 (LogLine.InputSignal),
+					 (LogLine.Model.u),
+					 (LogLine.Model.y),
+					 (LogLine.Model.y_delayed),
+					 (LogLine.Pid.CS),
+					 (LogLine.Pid.CS_raw),
+					 (LogLine.Pid.P),
+					 (LogLine.Pid.I),
+					 (LogLine.Pid.D),
+  				     (LogLine.Pid.e)
+			       );
+			 fputs(buff, pFile->file);
+
 	return;
 }
