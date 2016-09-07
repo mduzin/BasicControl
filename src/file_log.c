@@ -171,8 +171,8 @@ void   FileLogWrite(void* pInstance, const TIME_EVENT Events)
 
 	//prepare log line
 	//save log line
-	sprintf(buff, "%lu,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\n",
-					 ((long)LogLine.CurrTime),
+	sprintf(buff, "%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\n",
+					 (LogLine.CurrTime),
 					 (LogLine.InputSignal),
 					 (LogLine.Model.u),
 					 (LogLine.Model.y),
