@@ -116,7 +116,7 @@ STATUS RectangleSignalInit(IN INPUT_SIGNAL_RECT_PTR* ppInput)
 	//init internal values
 	(*ppInput)->Value      = STEP_SIGNAL_LOW;
 	(*ppInput)->InitValue  = STEP_SIGNAL_HIGH;
-	(*ppInput)->SwitchTime = 5;
+	(*ppInput)->SwitchTime = 25;
 
 
 	//Register events to time observe

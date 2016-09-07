@@ -50,7 +50,8 @@ int main(int argc, char *argv[])
 
 	//finishing simulation - free memory
 	FirstOrderModelClose(pModel);
-	//RegPidClose(pPid);
+	RegPidClose(pPid);
+	FileLogClose(pLogFile);
 
 	printf("Zakonczono symulacje.\n");
 	return 0;

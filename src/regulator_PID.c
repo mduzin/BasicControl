@@ -73,9 +73,9 @@ STATUS RegPidInit(REG_PID_PTR* ppPid)
 	   return STATUS_PTR_ERROR;
 	}
 
-	(*ppPid)->Reg_On = TRUE;
-	(*ppPid)->P_sel = TRUE;
-	(*ppPid)->I_sel = TRUE;
+	(*ppPid)->Reg_On = FALSE;
+	(*ppPid)->P_sel  = TRUE;
+	(*ppPid)->I_sel  = TRUE;
 	(*ppPid)->D_sel = FALSE;
 	(*ppPid)->AntiWindup = BACK_CALCULATION;
 	(*ppPid)->kp = 0.75;
@@ -160,6 +160,7 @@ void   RegPidRun(void* pInstance, const TIME_EVENT Events)
     if(FALSE == pPid->Reg_On)
    	{
    	   pPid->CS_raw = RectangleSignalGetValue(pPid->pInputCtx);
+   	   pPid->CS     = RectangleSignalGetValue(pPid->pInputCtx);
    	   return;
    	}
 
