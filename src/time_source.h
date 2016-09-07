@@ -12,7 +12,7 @@
 #include "adt.h"
 #include "time_observer.h"
 
-typedef long TIME_SOURCE_LOG_VALUES;
+typedef double TIME_SOURCE_LOG_VALUES;
 
 //API for ADT
 STATUS TimeSourceInit(TIME_SOURCE_CTX_PTR*);

@@ -229,7 +229,7 @@ STATUS TimeSourceGetLogValues(IN TIME_SOURCE_CTX_PTR pTimeCtx, OUT TIME_SOURCE_L
 		return STATUS_PTR_ERROR;
 	}
 
-	*pValues = pTimeCtx->CurrTsym;
+	*pValues = ((double)(pTimeCtx->CurrTsym)/1000.0);
 	return STATUS_SUCCESS;
 
 }
