@@ -11,7 +11,6 @@
 #include "time_source.h"
 #include "time_observer.h"
 
-#include "sim_env.h"
 
 
 typedef struct _REG_PID
