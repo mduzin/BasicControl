@@ -25,14 +25,14 @@ typedef struct _FIRST_ORDER_MODEL
    double y;	      //output value
    double y_delayed;  //output value for model with delay
 
-   double Integral;	        //zmienna wewnetrzna obiektu na ktorej obliczany ca³kowanie
+   double Integral;	            //zmienna wewnetrzna obiektu na ktorej obliczany ca³kowanie
 
    /*Zmienne z poprzedniej iteracji symulacji obiektu*/
-   double Prev_y;			//sygnal wyjsciowy
+   double Prev_y;			    //sygnal wyjsciowy
    double Buff_y;
-   double Prev_Int;	        //zmienna wewnetrzna obiektu na ktorej obliczany ca³kowanie w obiekcie
+   double Prev_Int;	            //zmienna wewnetrzna obiektu na ktorej obliczany ca³kowanie w obiekcie
 
-   double* Delay_array;		//wskaznik na tablice z opoznionymi probkami
+   double* Delay_array;		    //wskaznik na tablice z opoznionymi probkami
    int     Delay_array_size;	//rozmiar tablicy z opoznionymi probkami
 
    TIME_SOURCE_CTX_PTR pTimeCtx;
@@ -40,9 +40,9 @@ typedef struct _FIRST_ORDER_MODEL
 
 }FIRST_ORDER_MODEL;
 
-static void init_delay_array(double *array_ptr,int array_size, double init_val);
+static void   init_delay_array(double *array_ptr,int array_size, double init_val);
 static double shift_delay_array(double *array_ptr,int array_size, int shift);
-static void print_delay_array(double *array_ptr,int array_size);
+static void   print_delay_array(double *array_ptr,int array_size);
 
 STATUS FirstOrderModelInit(FIRST_ORDER_MODEL_PTR* ppModel)
 {
@@ -64,16 +64,23 @@ STATUS FirstOrderModelInit(FIRST_ORDER_MODEL_PTR* ppModel)
 	//Model parameters
 	(*ppModel)->k      = 1.0;	  // gain
 	(*ppModel)->Ts     = 4.0;	  // time const [s]
-	(*ppModel)->Tdelay = 0.5;     // model delay [s]
+	(*ppModel)->Tdelay = 0.0;     // model delay [s]
 	(*ppModel)->u      = 1.0;
 	(*ppModel)->y      = 0.0;
 
 
 
     //Internal variables
-    (*ppModel)->Prev_y   = 0.0;
-    (*ppModel)->Integral = 0.0;
-    (*ppModel)->Prev_Int = 0.0;
+    (*ppModel)->Prev_y    = 0.0;
+    (*ppModel)->Integral  = 0.0;
+    (*ppModel)->Prev_Int  = 0.0;
+    (*ppModel)->y_delayed = 0.0;
+    (*ppModel)->Buff_y    = 0.0;
+
+    //Others
+    (*ppModel)->Delay_array = NULL;
+    (*ppModel)->Delay_array_size = 0;
+
 
     //Register events to time observe
    	Events = (TE_BOT |
@@ -119,6 +126,11 @@ STATUS FirstOrderModelPostInit(IO FIRST_ORDER_MODEL_PTR pModel,
        	   init_delay_array((pModel)->Delay_array,(pModel)->Delay_array_size, 0.0);
    	    }
      }
+    else
+    {
+    	(pModel)->Delay_array_size = 0;
+    	(pModel)->Delay_array = NULL;
+    }
 
      return STATUS_SUCCESS;
 
@@ -127,7 +139,10 @@ STATUS FirstOrderModelPostInit(IO FIRST_ORDER_MODEL_PTR pModel,
 
 STATUS FirstOrderModelClose(FIRST_ORDER_MODEL_PTR pModel)
 {
-	free(pModel->Delay_array);
+	if(NULL != (pModel->Delay_array))
+	{
+	   free(pModel->Delay_array);
+	}
 	free(pModel);
 	pModel = NULL;
 	return STATUS_SUCCESS;
@@ -175,7 +190,7 @@ void FirstOrderModelRun(void* pInstance, const TIME_EVENT Events)
    		pModel->y_delayed = pModel->y;
    	}
 
-   //printf("Model output: %f\n",pModel->y_delayed);
+   printf("Model output: %f\n",pModel->y_delayed);
 }
 
 double FirstOrderModelGetOutput(FIRST_ORDER_MODEL_PTR pModel)
@@ -186,6 +201,7 @@ double FirstOrderModelGetOutput(FIRST_ORDER_MODEL_PTR pModel)
    }
 
    return pModel->y_delayed;
+
 
 }
 
