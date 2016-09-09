@@ -139,7 +139,7 @@ STATUS FirstOrderModelPostInit(IO FIRST_ORDER_MODEL_PTR pModel,
 
 STATUS FirstOrderModelClose(FIRST_ORDER_MODEL_PTR pModel)
 {
-	if(NULL != (pModel->Delay_array))
+	if((NO_DELAY != (pModel->Tdelay)) && (NULL != (pModel->Delay_array)) )
 	{
 	   free(pModel->Delay_array);
 	}
