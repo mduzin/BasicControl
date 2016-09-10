@@ -190,7 +190,7 @@ void FirstOrderModelRun(void* pInstance, const TIME_EVENT Events)
    		pModel->y_delayed = pModel->y;
    	}
 
-   printf("Model output: %f\n",pModel->y_delayed);
+   //printf("Model output: %f\n",pModel->y_delayed);
 }
 
 double FirstOrderModelGetOutput(FIRST_ORDER_MODEL_PTR pModel)

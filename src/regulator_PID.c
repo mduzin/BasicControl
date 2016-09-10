@@ -13,6 +13,7 @@
 
 
 
+
 typedef struct _REG_PID
 {
    //settings
@@ -47,7 +48,7 @@ typedef struct _REG_PID
    double prev_int_es;
 
    BOOL Saturation;
-   int  TpCounter;	//number of 10ms ticks to start regulator
+   int  TpCounter;	//number of callback ticks to start regulator
    int  TpAcc;		//current number of counted ticks
 
    TIME_SOURCE_CTX_PTR    pTimeCtx;
@@ -56,9 +57,82 @@ typedef struct _REG_PID
 
 }REG_PID;
 
+
+
+//search best TE based on Scanning period value
+static STATUS RegPidSetTE(IN double Tp, OUT int* Te, OUT int* TpCounter )
+{
+
+  long Te_array[]= {TIME_1000MS,
+		            TIME_500MS,
+					TIME_100MS,
+					TIME_20MS,
+     				TIME_10MS };
+  long Tp_long;
+  int i = 0;
+
+
+  if(0.0 >= Tp)
+  {
+	  return STATUS_INVALID_PARAMS;
+  }
+
+  if((NULL == Te) || (NULL == TpCounter))
+  {
+	  return STATUS_PTR_ERROR;
+  }
+
+  //in worst case we will return TE_10MS with properly adjusted TpCounter
+  //we assume the Tp must be multiplication of 10ms period
+
+  Tp_long = (long)(Tp*1000.0);
+
+  for(i = 0; i<ARRAY_SIZE(Te_array); i++)
+  {
+    if(0 == (Tp_long%Te_array[i]))
+    {
+       switch(Te_array[i])
+       {
+          case TIME_1000MS:
+    	      *Te = TE_1000MS;
+    	      break;
+
+    	   case TIME_500MS:
+    		  *Te = TE_500MS;
+	      	  break;
+
+    	   case TIME_100MS:
+    	      *Te = TE_100MS;
+    		  break;
+
+    	   case TIME_20MS:
+    		  *Te = TE_20MS;
+    		  break;
+
+    	   case TIME_10MS:
+    		  *Te = TE_10MS;
+    		  break;
+
+    	   default:
+    		   return STATUS_FAILURE;
+
+    	   }
+
+       *TpCounter = Tp_long/Te_array[i];
+       break;
+    }
+  }
+  //printf("%d, %d\n",*Te,*TpCounter);
+  return STATUS_SUCCESS;
+
+
+// return TE;
+}
+
 STATUS RegPidInit(REG_PID_PTR* ppPid)
 {
 	TIME_EVENT Events;
+	int TimeEvent = TE_10MS;
 
 	if(NULL == ppPid)
 	{
@@ -72,18 +146,18 @@ STATUS RegPidInit(REG_PID_PTR* ppPid)
 	   return STATUS_PTR_ERROR;
 	}
 
-	(*ppPid)->Reg_On = FALSE;
+	(*ppPid)->Reg_On = TRUE;
 	(*ppPid)->P_sel  = TRUE;
 	(*ppPid)->I_sel  = TRUE;
 	(*ppPid)->D_sel = FALSE;
-	(*ppPid)->AntiWindup = BACK_CALCULATION;
-	(*ppPid)->kp = 0.75;
+	(*ppPid)->AntiWindup = NO_ANTI_WINDUP;
+	(*ppPid)->kp = 1.0;
 	(*ppPid)->Ti = 3.0;
 	(*ppPid)->Td = 0.0;
-	(*ppPid)->Tp = 1.0;
+	(*ppPid)->Tp = 1.7;
 	(*ppPid)->Tt = 5.0;
-	(*ppPid)->CS_min = -3.0;
-	(*ppPid)->CS_max = 3.0;
+	(*ppPid)->CS_min = -5.0;
+	(*ppPid)->CS_max = 5.0;
 
 	   //runtime
 	(*ppPid)->P = 0.0;
@@ -104,9 +178,12 @@ STATUS RegPidInit(REG_PID_PTR* ppPid)
 	(*ppPid)->TpAcc = 0;
 	(*ppPid)->TpCounter = (int)DIV_ROUND_CLOSEST((*ppPid)->Tp, T10_MS);
 
+
+	RegPidSetTE((*ppPid)->Tp,&TimeEvent,&((*ppPid)->TpCounter));
+
 	//Register events to time observe
 	Events = (TE_BOT |
-   			  TE_10MS);
+			TimeEvent);
 
     //call register API
     CreateObserver((void*)(*ppPid), Events, RegPidRun);
@@ -154,7 +231,6 @@ void   RegPidRun(void* pInstance, const TIME_EVENT Events)
 	pPid = (REG_PID*)pInstance;
 
 
-
     //regulator Off forward SP to CS
     if(FALSE == pPid->Reg_On)
    	{
@@ -162,6 +238,19 @@ void   RegPidRun(void* pInstance, const TIME_EVENT Events)
    	   pPid->CS     = RectangleSignalGetValue(pPid->pInputCtx);
    	   return;
    	}
+
+
+    //scanning period accu inc.
+    (pPid->TpAcc)++;
+
+    //if  TpAcc is < TpCounter it means we dont have to calculate new CS
+    if((pPid->TpAcc) < (pPid->TpCounter))
+    {
+    	//do nothing
+    	return;
+    }
+
+    //It is time to calculate new CS
 
     //save values from previous iteration
     pPid->prev_e = pPid->e;
