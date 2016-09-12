@@ -15,7 +15,7 @@
 #include "input_signal.h"
 #include "time_observer.h"
 
-#define STEP_SIGNAL_HIGH 1.0
+#define STEP_SIGNAL_HIGH 5.0
 #define STEP_SIGNAL_LOW  0.0
 
 typedef struct _INPUT_SIGNAL_STEP

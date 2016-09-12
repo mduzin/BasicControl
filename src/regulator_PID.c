@@ -132,7 +132,7 @@ static STATUS RegPidSetTE(IN double Tp, OUT int* Te, OUT int* TpCounter )
 STATUS RegPidInit(REG_PID_PTR* ppPid)
 {
 	TIME_EVENT Events;
-	int TimeEvent = TE_10MS;
+	int BestTimeEvent = TE_10MS;
 
 	if(NULL == ppPid)
 	{
@@ -150,14 +150,14 @@ STATUS RegPidInit(REG_PID_PTR* ppPid)
 	(*ppPid)->P_sel  = TRUE;
 	(*ppPid)->I_sel  = TRUE;
 	(*ppPid)->D_sel = FALSE;
-	(*ppPid)->AntiWindup = NO_ANTI_WINDUP;
-	(*ppPid)->kp = 1.0;
-	(*ppPid)->Ti = 3.0;
+	(*ppPid)->AntiWindup = INTEGRATOR_CLAMPING;
+	(*ppPid)->kp = 0.5;
+	(*ppPid)->Ti = 5.0;
 	(*ppPid)->Td = 0.0;
-	(*ppPid)->Tp = 1.7;
+	(*ppPid)->Tp = 0.5;
 	(*ppPid)->Tt = 5.0;
-	(*ppPid)->CS_min = -5.0;
-	(*ppPid)->CS_max = 5.0;
+	(*ppPid)->CS_min = 0.0;
+	(*ppPid)->CS_max = 3.0;
 
 	   //runtime
 	(*ppPid)->P = 0.0;
@@ -179,11 +179,12 @@ STATUS RegPidInit(REG_PID_PTR* ppPid)
 	(*ppPid)->TpCounter = (int)DIV_ROUND_CLOSEST((*ppPid)->Tp, T10_MS);
 
 
-	RegPidSetTE((*ppPid)->Tp,&TimeEvent,&((*ppPid)->TpCounter));
+	//Determinate best Time Event to register on
+	RegPidSetTE((*ppPid)->Tp,&BestTimeEvent,&((*ppPid)->TpCounter));
 
 	//Register events to time observe
 	Events = (TE_BOT |
-			TimeEvent);
+			  BestTimeEvent);
 
     //call register API
     CreateObserver((void*)(*ppPid), Events, RegPidRun);
